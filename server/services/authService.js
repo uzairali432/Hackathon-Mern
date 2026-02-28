@@ -82,7 +82,7 @@ export class AuthService {
    * @returns {Object} Created user and tokens
    */
   static async register(userData) {
-    const { firstName, lastName, email, password } = userData;
+    const { firstName, lastName, email, password, role } = userData;
 
     // Check if user already exists
     const existingUser = await User.findByEmail(email);
@@ -90,12 +90,13 @@ export class AuthService {
       throw new ApiError('Email already registered', 409);
     }
 
-    // Create new user
+    // Create new user (include role if provided)
     const user = new User({
       firstName,
       lastName,
       email,
       password,
+      role: role || undefined,
     });
 
     await user.save();

@@ -17,6 +17,6 @@ export const userValidators = {
 
   updateRole: Joi.object({
     userId: Joi.string().required(),
-    role: Joi.string().valid('user', 'admin').required(),
+    role: Joi.string().valid('admin', 'doctor', 'receptionist', 'patient', 'user').required(),
   }),
 };

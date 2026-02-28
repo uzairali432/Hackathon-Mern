@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useSignupMutation } from '../services/authApi';
-import { loginSuccess, loginFailure } from '../store/slices/authSlice';
+import { loginFailure } from '../store/slices/authSlice';
 import { User, Mail, Lock, AlertCircle, Loader, UserCheck } from 'lucide-react';
 
 const signupSchema = yup.object({
@@ -13,6 +13,7 @@ const signupSchema = yup.object({
   lastName: yup.string().min(2, 'Last name must be at least 2 characters').required('Last name is required'),
   email: yup.string().email('Please enter a valid email').required('Email is required'),
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  role: yup.string().oneOf(['admin', 'doctor', 'receptionist', 'patient', 'user'], 'Invalid role').required('Role is required'),
 });
 
 export default function SignupPage() {
@@ -27,14 +28,15 @@ export default function SignupPage() {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(signupSchema),
+    defaultValues: { role: 'patient' },
   });
 
   const onSubmit = async (data) => {
     try {
       setServerError('');
-      const response = await signup(data).unwrap();
-      dispatch(loginSuccess(response.data));
-      navigate('/dashboard');
+      await signup(data).unwrap();
+      // Redirect to login page after successful signup
+      navigate('/login', { state: { message: 'Account created successfully! Please sign in to continue.' } });
     } catch (error) {
       const errorMessage = error.data?.message || 'Signup failed. Please try again.';
       setServerError(errorMessage);
@@ -116,13 +118,34 @@ export default function SignupPage() {
               <input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder=""
                 {...register('email')}
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
               />
             </div>
             {errors.email && (
               <p className="mt-1.5 text-sm text-red-600">{errors.email.message}</p>
+            )}
+          </div>
+
+          {/* Role Field */}
+          <div>
+            <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+              Role
+            </label>
+            <select
+              id="role"
+              {...register('role')}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+            >
+              <option value="patient">Patient</option>
+              <option value="user">User</option>
+              <option value="doctor">Doctor</option>
+              <option value="receptionist">Receptionist</option>
+              <option value="admin">Admin</option>
+            </select>
+            {errors.role && (
+              <p className="mt-1.5 text-sm text-red-600">{errors.role.message}</p>
             )}
           </div>
 

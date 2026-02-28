@@ -1,23 +1,25 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useLoginMutation } from '../services/authApi';
 import { loginSuccess, loginFailure } from '../store/slices/authSlice';
-import { Mail, Lock, AlertCircle, Loader } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Loader, CheckCircle } from 'lucide-react';
 
 const loginSchema = yup.object({
   email: yup.string().email('Please enter a valid email').required('Email is required'),
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
 });
 
-export default function LoginPage() {
+export default function LoginPage({ expectedRole = null }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const [login, { isLoading }] = useLoginMutation();
   const [serverError, setServerError] = useState('');
+  const successMessage = location.state?.message;
 
   const {
     register,
@@ -31,6 +33,15 @@ export default function LoginPage() {
     try {
       setServerError('');
       const response = await login(data).unwrap();
+
+      // If this LoginPage expects a specific role, enforce it
+      if (expectedRole && response.data?.user?.role !== expectedRole) {
+        const msg = `This account is not a ${expectedRole}. Please sign in on the correct page.`;
+        setServerError(msg);
+        dispatch(loginFailure(msg));
+        return;
+      }
+
       dispatch(loginSuccess(response.data));
       navigate('/dashboard');
     } catch (error) {
@@ -50,8 +61,10 @@ export default function LoginPage() {
               <Lock className="w-6 h-6 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
-          <p className="text-gray-600">Sign in to your account to continue</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {expectedRole ? `${expectedRole.charAt(0).toUpperCase() + expectedRole.slice(1)} Sign In` : 'Welcome back'}
+          </h1>
+          <p className="text-gray-600">{expectedRole ? `Sign in as ${expectedRole}` : 'Sign in to your account to continue'}</p>
         </div>
 
         {/* Error Alert */}
@@ -59,6 +72,14 @@ export default function LoginPage() {
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-700">{serverError}</p>
+          </div>
+        )}
+
+        {/* Success Alert */}
+        {successMessage && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-green-700">{successMessage}</p>
           </div>
         )}
 

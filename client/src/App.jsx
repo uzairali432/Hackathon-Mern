@@ -17,7 +17,10 @@ export default function App() {
       <Router>
         <Routes>
           {/* Public Routes */}
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage expectedRole={null} />} />
+          <Route path="/login/patient" element={<LoginPage expectedRole={'patient'} />} />
+          <Route path="/login/doctor" element={<LoginPage expectedRole={'doctor'} />} />
+          <Route path="/login/receptionist" element={<LoginPage expectedRole={'receptionist'} />} />
           <Route path="/signup" element={<SignupPage />} />
 
           {/* Protected Routes */}

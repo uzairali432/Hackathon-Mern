@@ -32,6 +32,7 @@ export const authValidators = {
     lastName: nameSchema,
     email: emailSchema,
     password: passwordSchema,
+    role: Joi.string().valid('admin', 'doctor', 'receptionist', 'patient', 'user').optional(),
   }),
 
   login: Joi.object({
