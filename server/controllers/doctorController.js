@@ -91,19 +91,31 @@ export const writePrescription = asyncHandler(async (req, res) => {
 });
 
 /**
- * Get AI assistance for diagnosis
+ * Get AI assistance for diagnosis (Enhanced Smart Symptom Checker)
  * POST /api/v1/doctors/ai-assistance
  */
 export const getAIAssistance = asyncHandler(async (req, res) => {
-  const { symptoms, patientAge, patientGender } = req.body;
+  const { symptoms, patientAge, patientGender, patientId } = req.body;
 
   if (!symptoms || !Array.isArray(symptoms)) {
     throw new ApiError('Symptoms must be a non-empty array', 400);
   }
 
-  const aiSuggestions = await DoctorService.getAIAssistance(symptoms, patientAge, patientGender);
+  const aiSuggestions = await DoctorService.getAIAssistance(symptoms, patientAge, patientGender, patientId);
 
   res.status(200).json(new ApiResponse(200, aiSuggestions, 'AI suggestions retrieved successfully'));
+});
+
+/**
+ * Analyze patient risk flags
+ * GET /api/v1/doctors/patient/:patientId/risk-flags
+ */
+export const getPatientRiskFlags = asyncHandler(async (req, res) => {
+  const { patientId } = req.params;
+
+  const riskAnalysis = await DoctorService.analyzePatientRiskFlags(patientId);
+
+  res.status(200).json(new ApiResponse(200, riskAnalysis, 'Risk flags analyzed successfully'));
 });
 
 /**

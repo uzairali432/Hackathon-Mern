@@ -63,7 +63,8 @@ export const patientApi = createApi({
 
     // Get AI-generated explanation for prescription
     getPrescriptionExplanation: builder.query({
-      query: (prescriptionId) => `/patients/prescriptions/${prescriptionId}/explanation`,
+      query: ({ prescriptionId, language = 'english' }) => 
+        `/patients/prescriptions/${prescriptionId}/explanation?language=${language}`,
     }),
   }),
 });

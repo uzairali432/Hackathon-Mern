@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Lightbulb, AlertCircle, Search } from 'lucide-react';
 import axios from 'axios';
 
-export default function AIAssistance() {
+export default function AIAssistance({ patientId = null }) {
   const [symptoms, setSymptoms] = useState('');
   const [patientAge, setPatientAge] = useState('');
   const [patientGender, setPatientGender] = useState('');
+  const [patientIdInput, setPatientIdInput] = useState(patientId || '');
   const [suggestions, setSuggestions] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,6 +36,7 @@ export default function AIAssistance() {
           symptoms: symptomsArray,
           patientAge: patientAge || null,
           patientGender: patientGender || null,
+          patientId: patientIdInput || null,
         },
         {
           headers: {
@@ -55,10 +57,10 @@ export default function AIAssistance() {
     <div className="bg-white rounded-lg shadow p-6 space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-1">
-          <Lightbulb size={20} className="text-yellow-600" /> AI Diagnosis Assistance
+          <Lightbulb size={20} className="text-yellow-600" /> Smart Symptom Checker
         </h3>
         <p className="text-sm text-gray-600">
-          Get AI-assisted diagnosis suggestions based on patient symptoms
+          Enhanced AI-assisted diagnosis with patient history, risk levels, and suggested tests
         </p>
       </div>
 
@@ -109,6 +111,19 @@ export default function AIAssistance() {
           </div>
         </div>
 
+        {/* Patient ID (Optional - for history) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Patient ID (Optional - for history analysis)</label>
+          <input
+            type="text"
+            value={patientIdInput}
+            onChange={(e) => setPatientIdInput(e.target.value)}
+            placeholder="Enter patient ID to include medical history"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p className="text-xs text-gray-500 mt-1">Include patient history for better AI analysis</p>
+        </div>
+
         {/* Submit Button */}
         <button
           type="submit"
@@ -145,6 +160,41 @@ export default function AIAssistance() {
               <p>{warning}</p>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Risk Level */}
+      {suggestions?.riskLevel && (
+        <div className={`p-4 rounded-lg border-2 ${
+          suggestions.riskLevel === 'Critical' ? 'bg-red-50 border-red-300' :
+          suggestions.riskLevel === 'High' ? 'bg-orange-50 border-orange-300' :
+          suggestions.riskLevel === 'Medium' ? 'bg-yellow-50 border-yellow-300' :
+          'bg-green-50 border-green-300'
+        }`}>
+          <div className="flex items-center gap-2">
+            <AlertCircle size={20} className={
+              suggestions.riskLevel === 'Critical' ? 'text-red-600' :
+              suggestions.riskLevel === 'High' ? 'text-orange-600' :
+              suggestions.riskLevel === 'Medium' ? 'text-yellow-600' :
+              'text-green-600'
+            } />
+            <h4 className="font-semibold text-gray-900">Risk Level: <span className="capitalize">{suggestions.riskLevel}</span></h4>
+          </div>
+        </div>
+      )}
+
+      {/* Suggested Tests */}
+      {suggestions?.suggestedTests && suggestions.suggestedTests.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-semibold text-gray-900 mb-2">Suggested Diagnostic Tests:</h4>
+          <ul className="space-y-1">
+            {suggestions.suggestedTests.map((test, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
+                <span className="text-blue-600 font-bold">•</span>
+                <span>{test}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 

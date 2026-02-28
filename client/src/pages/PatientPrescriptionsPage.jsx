@@ -26,6 +26,7 @@ export default function PatientPrescriptionsPage() {
   const { user } = useSelector((state) => state.auth);
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [explanationLanguage, setExplanationLanguage] = useState('english');
   const [expandedPrescriptions, setExpandedPrescriptions] = useState(new Set());
   const [downloadPrescriptionPDF, { isLoading: isDownloading }] = useLazyDownloadPrescriptionPDFQuery();
 
@@ -37,9 +38,15 @@ export default function PatientPrescriptionsPage() {
     data: explanationData,
     isLoading: isLoadingExplanation,
     error: explanationError,
-  } = useGetPrescriptionExplanationQuery(selectedPrescription, {
-    skip: !selectedPrescription,
-  });
+    refetch: refetchExplanation,
+  } = useGetPrescriptionExplanationQuery(
+    selectedPrescription 
+      ? { prescriptionId: selectedPrescription, language: explanationLanguage }
+      : null,
+    {
+      skip: !selectedPrescription,
+    }
+  );
 
   const prescriptions = data?.data || [];
 
@@ -62,8 +69,9 @@ export default function PatientPrescriptionsPage() {
     }
   };
 
-  const handleViewExplanation = (prescriptionId) => {
+  const handleViewExplanation = (prescriptionId, language = 'english') => {
     setSelectedPrescription(prescriptionId);
+    setExplanationLanguage(language);
   };
 
   const getStatusIcon = (status) => {
@@ -335,17 +343,49 @@ export default function PatientPrescriptionsPage() {
                                   AI-Generated Explanation
                                 </h4>
                                 {!isSelected && (
-                                  <button
-                                    onClick={() => handleViewExplanation(prescription._id)}
-                                    className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm font-medium transition-colors"
-                                  >
-                                    Generate Explanation
-                                  </button>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => handleViewExplanation(prescription._id, 'english')}
+                                      className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm font-medium transition-colors"
+                                    >
+                                      English
+                                    </button>
+                                    <button
+                                      onClick={() => handleViewExplanation(prescription._id, 'urdu')}
+                                      className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm font-medium transition-colors"
+                                    >
+                                      اردو (Urdu)
+                                    </button>
+                                  </div>
                                 )}
                               </div>
 
                               {isSelected && (
                                 <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                  {/* Language Toggle */}
+                                  <div className="flex gap-2 mb-4">
+                                    <button
+                                      onClick={() => handleViewExplanation(prescription._id, 'english')}
+                                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                                        explanationLanguage === 'english'
+                                          ? 'bg-purple-600 text-white'
+                                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                      }`}
+                                    >
+                                      English
+                                    </button>
+                                    <button
+                                      onClick={() => handleViewExplanation(prescription._id, 'urdu')}
+                                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                                        explanationLanguage === 'urdu'
+                                          ? 'bg-purple-600 text-white'
+                                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                      }`}
+                                    >
+                                      اردو (Urdu)
+                                    </button>
+                                  </div>
+
                                   {isLoadingExplanation ? (
                                     <div className="flex items-center justify-center py-8">
                                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
@@ -356,7 +396,9 @@ export default function PatientPrescriptionsPage() {
                                     </div>
                                   ) : explanationData?.data?.explanation ? (
                                     <div className="prose max-w-none">
-                                      <p className="text-gray-700 whitespace-pre-line">
+                                      <p className={`text-gray-700 whitespace-pre-line ${
+                                        explanationLanguage === 'urdu' ? 'text-right' : 'text-left'
+                                      }`}>
                                         {explanationData.data.explanation}
                                       </p>
                                       {explanationData.data.note && (

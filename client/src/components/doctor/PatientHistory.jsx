@@ -1,6 +1,7 @@
 import { useGetPatientHistoryQuery } from "../../services/doctorApi";
 import { User, FileText, Pill, Calendar } from 'lucide-react';
 import { useState } from 'react';
+import RiskFlags from './RiskFlags';
 
 export default function PatientHistory({ patientId }) {
   const { data, isLoading, error } = useGetPatientHistoryQuery(patientId, {
@@ -133,6 +134,12 @@ export default function PatientHistory({ patientId }) {
           </div>
         </div>
       )}
+
+      {/* Risk Flags */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h4 className="text-lg font-semibold text-gray-900 mb-4">Risk Analysis</h4>
+        <RiskFlags patientId={patientId} />
+      </div>
     </div>
   );
 }

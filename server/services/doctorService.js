@@ -125,85 +125,78 @@ export class DoctorService {
   }
 
   /**
-   * Get AI assistance for diagnosis. If GEMINI_API_KEY is set in env, attempt real call,
-   * otherwise return simulated suggestions.
+   * Get AI assistance for diagnosis (Enhanced Smart Symptom Checker)
+   * Now includes patient history, risk levels, and suggested tests
    */
-  static async getAIAssistance(symptoms, patientAge, patientGender) {
-    const key = process.env.GEMINI_API_KEY;
-    const url = process.env.GEMINI_API_URL;
-
-    const symptomText = Array.isArray(symptoms) ? symptoms.join(', ') : String(symptoms || '');
-    const prompt = `Patient symptoms: ${symptomText}\nAge: ${patientAge || 'unknown'}\nGender: ${patientGender || 'unknown'}\n\nProvide the top 3 likely diagnoses with an ICD code if available, a confidence estimate, and short recommendations for each. Return the result in plain text.`;
-
-    if (key && url) {
+  static async getAIAssistance(symptoms, patientAge, patientGender, patientId = null) {
+    // Get patient history if patientId is provided
+    let patientHistory = null;
+    if (patientId) {
       try {
-        const response = await axios.post(`${url}?key=${key}`, { prompt }, { timeout: 15000 });
-
-        // Attempt to extract text from common response shapes
-        let text = '';
-        if (response.data) {
-          if (response.data.candidates && response.data.candidates.length) {
-            text = response.data.candidates[0].content || '';
-          } else if (response.data.output && response.data.output[0] && response.data.output[0].content) {
-            text = response.data.output[0].content;
-          } else if (response.data.outputs && response.data.outputs.length && response.data.outputs[0].content) {
-            text = response.data.outputs[0].content[0]?.text || response.data.outputs[0].content;
-          } else if (typeof response.data === 'string') {
-            text = response.data;
-          } else {
-            text = JSON.stringify(response.data);
-          }
-        }
-
-        const aiSuggestions = {
-          suggestions: [
-            {
-              condition: text.slice(0, 800),
-              confidence: 'N/A',
-              icdCode: '',
-              recommendations: [],
-            },
-          ],
-          disclaimer: 'AI suggestions are for reference only. Clinical judgment and patient examination are required for diagnosis.',
-          warnings: symptomText.includes('severe') ? ['Consider emergency consultation'] : [],
-          raw: text,
+        // Get all diagnoses and prescriptions for the patient (across all doctors)
+        const diagnoses = await Diagnosis.find({ patientId }).sort({ createdAt: -1 }).limit(10);
+        const prescriptions = await Prescription.find({ patientId }).sort({ createdAt: -1 }).limit(10);
+        const appointments = await Appointment.find({ patientId }).sort({ startTime: -1 }).limit(10);
+        
+        patientHistory = {
+          diagnoses,
+          prescriptions,
+          appointments: appointments.length,
         };
-
-        return aiSuggestions;
-      } catch (err) {
-        // Log and continue to fallback
-        // eslint-disable-next-line no-console
-        console.error('Gemini/API request failed:', err.message || err);
+      } catch (error) {
+        // Continue without history if fetch fails
+        console.error('Failed to fetch patient history for AI:', error.message);
       }
     }
 
-    // Fallback: Simulated AI suggestions based on symptoms
-    const aiSuggestions = {
-      suggestions: [
+    // Use enhanced AI service
+    const { AIService } = await import('./aiService.js');
+    const result = await AIService.smartSymptomChecker(symptoms, patientAge, patientGender, patientHistory);
+
+    // Format response to match existing structure
+    const suggestions = result.conditions.map((condition, index) => {
+      if (typeof condition === 'string') {
+        return {
+          condition: condition,
+          confidence: 'N/A',
+          icdCode: '',
+          recommendations: result.recommendations || [],
+        };
+      }
+      return condition;
+    });
+
+    return {
+      suggestions: suggestions.length > 0 ? suggestions : [
         {
-          condition: 'Common Cold/Upper Respiratory Infection',
-          confidence: '65%',
-          icdCode: 'J00',
-          recommendations: ['Rest', 'Hydration', 'Over-the-counter pain relief'],
-        },
-        {
-          condition: 'Mild Viral Infection',
-          confidence: '45%',
-          icdCode: 'B34.9',
-          recommendations: ['Monitor symptoms', 'Supportive care', 'Rest'],
-        },
-        {
-          condition: 'Allergic Reaction',
-          confidence: '35%',
-          icdCode: 'T78.4',
-          recommendations: ['Identify allergen', 'Antihistamines', 'Avoid trigger'],
+          condition: 'Symptom Evaluation Needed',
+          confidence: 'N/A',
+          icdCode: '',
+          recommendations: result.recommendations || [],
         },
       ],
-      disclaimer: 'AI suggestions are for reference only. Clinical judgment and patient examination are required for diagnosis.',
-      warnings: symptomText.includes('severe') ? ['Consider emergency consultation'] : [],
+      riskLevel: result.riskLevel,
+      suggestedTests: result.suggestedTests,
+      disclaimer: result.disclaimer,
+      warnings: result.riskLevel === 'High' || result.riskLevel === 'Critical' 
+        ? ['Consider immediate consultation'] 
+        : [],
+      raw: result.rawResponse || '',
     };
+  }
 
-    return aiSuggestions;
+  /**
+   * Analyze patient risk flags (repeated infections, chronic symptoms)
+   */
+  static async analyzePatientRiskFlags(patientId) {
+    // Get all patient data
+    const diagnoses = await Diagnosis.find({ patientId }).sort({ createdAt: -1 });
+    const prescriptions = await Prescription.find({ patientId }).sort({ createdAt: -1 });
+    const appointments = await Appointment.find({ patientId }).sort({ startTime: -1 });
+
+    // Use AI service for risk analysis
+    const { AIService } = await import('./aiService.js');
+    return await AIService.analyzeRiskFlags(patientId, diagnoses, prescriptions, appointments);
   }
 
   /**

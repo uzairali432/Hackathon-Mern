@@ -16,6 +16,7 @@ router.patch('/appointments/:appointmentId/status', authenticate, authorize('doc
 // Patient management
 router.get('/patient/:patientId/history', authenticate, authorize('doctor'), doctorController.getPatientHistory);
 router.get('/patient/:patientId/prescriptions', authenticate, authorize('doctor'), doctorController.getPatientPrescriptions);
+router.get('/patient/:patientId/risk-flags', authenticate, authorize('doctor'), doctorController.getPatientRiskFlags);
 
 // Diagnosis & Prescriptions
 router.post('/diagnosis', authenticate, authorize('doctor'), doctorController.addDiagnosis);

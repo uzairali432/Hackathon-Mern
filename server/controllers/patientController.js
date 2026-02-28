@@ -163,14 +163,20 @@ export const downloadPrescriptionPDF = asyncHandler(async (req, res) => {
 });
 
 /**
- * Get AI-generated explanation for prescription
- * GET /api/v1/patients/prescriptions/:id/explanation
+ * Get AI-generated explanation for prescription (Enhanced with lifestyle recommendations and Urdu mode)
+ * GET /api/v1/patients/prescriptions/:id/explanation?language=english|urdu
  */
 export const getPrescriptionExplanation = asyncHandler(async (req, res) => {
   const patientId = req.user._id;
   const { id } = req.params;
+  const { language = 'english' } = req.query;
 
-  const explanation = await PatientService.getPrescriptionExplanation(id, patientId);
+  // Validate language
+  if (!['english', 'urdu'].includes(language.toLowerCase())) {
+    throw new ApiError('Invalid language. Must be "english" or "urdu"', 400);
+  }
+
+  const explanation = await PatientService.getPrescriptionExplanation(id, patientId, language.toLowerCase());
 
   res.status(200).json(
     new ApiResponse(200, explanation, 'Prescription explanation generated successfully')
