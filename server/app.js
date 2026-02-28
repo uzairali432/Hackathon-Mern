@@ -11,6 +11,7 @@ import authRoutes from './routes/v1/authRoutes.js';
 import userRoutes from './routes/v1/userRoutes.js';
 import doctorRoutes from './routes/v1/doctorRoutes.js';
 import receptionistRoutes from './routes/v1/receptionistRoutes.js';
+import patientRoutes from './routes/v1/patientRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { ApiError } from './utils/ApiError.js';
 
@@ -75,6 +76,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/doctors', doctorRoutes);
 app.use('/api/v1/receptionists', receptionistRoutes);
+app.use('/api/v1/patients', patientRoutes);
 
 // ========================
 // Health Check Route

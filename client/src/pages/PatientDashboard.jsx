@@ -2,7 +2,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useLogoutMutation } from '../services/authApi';
 import { logout as logoutAction } from '../store/slices/authSlice';
-import { LogOut, Settings, User, Calendar } from 'lucide-react';
+import { LogOut, Settings, User, Calendar, Pill } from 'lucide-react';
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export default function PatientDashboard() {
 
       {/* Main content */}
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Appointments Card */}
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-4">
@@ -71,14 +71,33 @@ export default function PatientDashboard() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Appointments</h3>
-                <p className="text-sm text-gray-500">View and schedule appointments</p>
+                <p className="text-sm text-gray-500">View appointment history</p>
               </div>
             </div>
             <button
               onClick={() => handleNavigate('/patient/appointments')}
               className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium transition-colors"
             >
-              Manage Appointments
+              View Appointments
+            </button>
+          </div>
+
+          {/* Prescriptions Card */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center gap-4">
+              <div className="bg-green-100 rounded-full p-3">
+                <Pill className="text-green-600" size={24} />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Prescriptions</h3>
+                <p className="text-sm text-gray-500">View and download prescriptions</p>
+              </div>
+            </div>
+            <button
+              onClick={() => handleNavigate('/patient/prescriptions')}
+              className="mt-4 w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium transition-colors"
+            >
+              View Prescriptions
             </button>
           </div>
 

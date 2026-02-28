@@ -6,6 +6,8 @@ import { AdminRoute } from './routes/AdminRoute';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import PatientDashboard from './pages/PatientDashboard';
+import PatientAppointmentsPage from './pages/PatientAppointmentsPage';
+import PatientPrescriptionsPage from './pages/PatientPrescriptionsPage';
 import DoctorDashboard from './pages/DoctorDashboard';
 import ReceptionistDashboard from './pages/ReceptionistDashboard';
 import ProfilePage from './pages/ProfilePage';
@@ -31,6 +33,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <PatientDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patient/appointments"
+            element={
+              <ProtectedRoute>
+                <PatientAppointmentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patient/prescriptions"
+            element={
+              <ProtectedRoute>
+                <PatientPrescriptionsPage />
               </ProtectedRoute>
             }
           />
