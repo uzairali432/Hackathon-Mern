@@ -44,6 +44,65 @@ export class UserService {
   }
 
   /**
+   * Get users by role
+   * @param {string} role
+   */
+  static async getUsersByRole(role, options = {}) {
+    const { limit = 10, skip = 0 } = options;
+    const query = { role };
+    const users = await User.find(query)
+      .limit(limit)
+      .skip(skip)
+      .sort({ createdAt: -1 });
+
+    const total = await User.countDocuments(query);
+
+    return { users, total, limit, skip };
+  }
+
+  /**
+   * Return simulated analytics data for admin dashboard
+   */
+  static async getAnalytics() {
+    // Simulated metrics — in a real app you'd aggregate from DB
+    const totalUsers = await User.countDocuments();
+    const totalDoctors = await User.countDocuments({ role: 'doctor' });
+    const totalReceptionists = await User.countDocuments({ role: 'receptionist' });
+    const totalPatients = await User.countDocuments({ role: 'patient' });
+
+    const monthlySignups = Math.floor(Math.random() * 200) + 20; // simulated
+
+    return {
+      totalUsers,
+      totalDoctors,
+      totalReceptionists,
+      totalPatients,
+      monthlySignups,
+      revenueEstimate: (monthlySignups * 9.99).toFixed(2), // simulated
+    };
+  }
+
+  /**
+   * Update or simulate subscription plan for a user
+   * @param {string} userId
+   * @param {Object} data
+   */
+  static async updateSubscription(userId, data) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError('User not found', 404);
+    }
+
+    user.subscription = user.subscription || {};
+    if (data.plan) user.subscription.plan = data.plan;
+    if (data.status) user.subscription.status = data.status;
+    if (data.expiresAt) user.subscription.expiresAt = data.expiresAt;
+
+    await user.save();
+    return user;
+  }
+
+  /**
    * Update user profile
    * @param {string} userId - User ID
    * @param {Object} updateData - Data to update

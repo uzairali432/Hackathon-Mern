@@ -3,6 +3,8 @@ import authReducer from './slices/authSlice';
 import userReducer from './slices/userSlice';
 import { authApi } from '../services/authApi';
 import { userApi } from '../services/userApi';
+import { doctorApi } from '../services/doctorApi';
+import { receptionistApi } from '../services/receptionistApi';
 
 export const store = configureStore({
   reducer: {
@@ -10,9 +12,11 @@ export const store = configureStore({
     user: userReducer,
     [authApi.reducerPath]: authApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [doctorApi.reducerPath]: doctorApi.reducer,
+    [receptionistApi.reducerPath]: receptionistApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware, userApi.middleware),
+    getDefaultMiddleware().concat(authApi.middleware, userApi.middleware, doctorApi.middleware, receptionistApi.middleware),
 });
 
 export default store;

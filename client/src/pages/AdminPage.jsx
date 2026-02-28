@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetAllUsersQuery, useUpdateUserRoleMutation, useDeleteUserMutation } from '../services/userApi';
+import { useGetAllUsersQuery, useUpdateUserRoleMutation, useDeleteUserMutation, useUpdateSubscriptionMutation, useGetAnalyticsQuery, useGetSystemUsageQuery, useGetSystemHealthQuery } from '../services/userApi';
 import { ArrowLeft, Edit2, Trash2, Check, X } from 'lucide-react';
 
 export default function AdminPage() {
@@ -9,8 +9,11 @@ export default function AdminPage() {
   const [updateRole] = useUpdateUserRoleMutation();
   const [deleteUser] = useDeleteUserMutation();
   const [selectedUsers, setSelectedUsers] = useState({});
+  const [showSystemUsage, setShowSystemUsage] = useState(false);
 
   const users = data?.data?.users || [];
+  const { data: systemUsage } = useGetSystemUsageQuery(undefined, { skip: !showSystemUsage });
+  const { data: systemHealth } = useGetSystemHealthQuery(undefined, { skip: !showSystemUsage });
 
   const handleToggleUserSelect = (userId) => {
     setSelectedUsers((prev) => ({
@@ -25,6 +28,19 @@ export default function AdminPage() {
       alert('User role updated successfully');
     } catch (error) {
       alert(`Error: ${error.data?.message || 'Failed to update role'}`);
+    }
+  };
+
+  const [updateSubscription] = useUpdateSubscriptionMutation();
+  const { data: analytics } = useGetAnalyticsQuery(undefined, { skip: !true });
+
+  const handleUpdateSubscription = async (userId) => {
+    // Simulate toggling subscription plan for demo
+    try {
+      await updateSubscription({ userId, plan: 'basic', status: 'active' }).unwrap();
+      alert('Subscription updated (simulated)');
+    } catch (err) {
+      alert('Failed to update subscription');
     }
   };
 
@@ -47,7 +63,7 @@ export default function AdminPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 h-auto sm:h-16 py-3 sm:py-0">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/admin')}
                 className="p-2 hover:bg-gray-100 rounded-md transition-colors"
               >
                 <ArrowLeft size={20} />
@@ -75,6 +91,197 @@ export default function AdminPage() {
 
         {users.length > 0 && !isLoading && (
           <>
+            {/* Admin actions */}
+            <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 flex-wrap">
+              <button
+                onClick={() => {
+                  const summary = analytics
+                    ? `Users: ${analytics.totalUsers}, Doctors: ${analytics.totalDoctors}, Receptionists: ${analytics.totalReceptionists}, Patients: ${analytics.totalPatients}`
+                    : 'Analytics not loaded';
+                  alert(summary);
+                }}
+                className="px-3 py-2 bg-indigo-600 text-white rounded-md"
+              >
+                View Analytics (Simulated)
+              </button>
+              <button
+                onClick={() => setShowSystemUsage(!showSystemUsage)}
+                className="px-3 py-2 bg-green-600 text-white rounded-md"
+              >
+                {showSystemUsage ? 'Hide System Usage' : 'View System Usage'}
+              </button>
+            </div>
+
+            {/* System Usage Section */}
+            {showSystemUsage && systemUsage?.data && (
+              <div className="mb-8 space-y-4">
+                <h2 className="text-xl font-bold text-gray-900">System Usage Monitoring</h2>
+
+                {/* System Health Status */}
+                {systemHealth?.data && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div className={`p-4 rounded-lg text-white font-semibold ${
+                      systemHealth.data.overall === 'critical' ? 'bg-red-600' :
+                      systemHealth.data.overall === 'warning' ? 'bg-yellow-600' :
+                      'bg-green-600'
+                    }`}>
+                      <p className="text-sm opacity-90">Overall Status</p>
+                      <p className="text-lg capitalize">{systemHealth.data.overall}</p>
+                    </div>
+                    <div className={`p-4 rounded-lg text-white font-semibold ${
+                      systemHealth.data.cpu === 'critical' ? 'bg-red-600' :
+                      systemHealth.data.cpu === 'warning' ? 'bg-yellow-600' :
+                      'bg-blue-600'
+                    }`}>
+                      <p className="text-sm opacity-90">CPU</p>
+                      <p className="text-lg capitalize">{systemHealth.data.cpu}</p>
+                    </div>
+                    <div className={`p-4 rounded-lg text-white font-semibold ${
+                      systemHealth.data.memory === 'critical' ? 'bg-red-600' :
+                      systemHealth.data.memory === 'warning' ? 'bg-yellow-600' :
+                      'bg-blue-600'
+                    }`}>
+                      <p className="text-sm opacity-90">Memory</p>
+                      <p className="text-lg capitalize">{systemHealth.data.memory}</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-purple-600 text-white font-semibold">
+                      <p className="text-sm opacity-90">Database</p>
+                      <p className="text-lg capitalize">{systemHealth.data.database}</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-purple-600 text-white font-semibold">
+                      <p className="text-sm opacity-90">API Status</p>
+                      <p className="text-lg capitalize">{systemHealth.data.api}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* System Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* CPU Usage */}
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <p className="text-sm text-gray-600 uppercase font-semibold mb-2">CPU Usage</p>
+                    <div className="space-y-2">
+                      <p className="text-3xl font-bold text-gray-900">{systemUsage.data.system.cpuUsage}%</p>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${
+                            systemUsage.data.system.cpuUsage > 80 ? 'bg-red-600' :
+                            systemUsage.data.system.cpuUsage > 60 ? 'bg-yellow-600' :
+                            'bg-green-600'
+                          }`}
+                          style={{ width: `${systemUsage.data.system.cpuUsage}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Memory Usage */}
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <p className="text-sm text-gray-600 uppercase font-semibold mb-2">Memory Usage</p>
+                    <div className="space-y-2">
+                      <p className="text-3xl font-bold text-gray-900">{systemUsage.data.system.memoryUsage}%</p>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${
+                            systemUsage.data.system.memoryUsage > 85 ? 'bg-red-600' :
+                            systemUsage.data.system.memoryUsage > 70 ? 'bg-yellow-600' :
+                            'bg-green-600'
+                          }`}
+                          style={{ width: `${systemUsage.data.system.memoryUsage}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Disk Usage */}
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <p className="text-sm text-gray-600 uppercase font-semibold mb-2">Disk Usage</p>
+                    <div className="space-y-2">
+                      <p className="text-3xl font-bold text-gray-900">{systemUsage.data.system.diskUsage}%</p>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${
+                            systemUsage.data.system.diskUsage > 85 ? 'bg-red-600' :
+                            systemUsage.data.system.diskUsage > 70 ? 'bg-yellow-600' :
+                            'bg-green-600'
+                          }`}
+                          style={{ width: `${systemUsage.data.system.diskUsage}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* API Status */}
+                  <div className="bg-white rounded-lg shadow p-6">
+                    <p className="text-sm text-gray-600 uppercase font-semibold mb-2">API Metrics</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Requests/min:</span>
+                        <span className="font-semibold text-gray-900">{systemUsage.data.api.requestsPerMinute}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Total requests:</span>
+                        <span className="font-semibold text-gray-900">{systemUsage.data.api.totalRequests}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Uptime:</span>
+                        <span className="font-semibold text-gray-900">{systemUsage.data.api.uptime}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* User Statistics */}
+                <div className="bg-white rounded-lg shadow p-6">
+                  <p className="text-lg font-semibold text-gray-900 mb-4">User Statistics</p>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-blue-600">{systemUsage.data.users.total}</p>
+                      <p className="text-sm text-gray-600 mt-1">Total Users</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-green-600">{systemUsage.data.users.active}</p>
+                      <p className="text-sm text-gray-600 mt-1">Active Users</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-purple-600">{systemUsage.data.users.doctors}</p>
+                      <p className="text-sm text-gray-600 mt-1">Doctors</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-yellow-600">{systemUsage.data.users.receptionists}</p>
+                      <p className="text-sm text-gray-600 mt-1">Receptionists</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-pink-600">{systemUsage.data.users.patients}</p>
+                      <p className="text-sm text-gray-600 mt-1">Patients</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                {systemUsage.data.recentActivity && systemUsage.data.recentActivity.length > 0 && (
+                  <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                      <p className="text-lg font-semibold text-gray-900">Recent Activity</p>
+                    </div>
+                    <div className="divide-y divide-gray-200">
+                      {systemUsage.data.recentActivity.slice(0, 5).map((activity, idx) => (
+                        <div key={idx} className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">{activity.action}</p>
+                            <p className="text-sm text-gray-600 mt-1">{activity.user}</p>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-2 sm:mt-0">
+                            {new Date(activity.timestamp).toLocaleTimeString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Desktop Table View */}
             <div className="hidden lg:block bg-white shadow rounded-lg overflow-hidden">
               <div className="overflow-x-auto">
@@ -89,6 +296,9 @@ export default function AdminPage() {
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                         Role
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        Subscription
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                         Status
@@ -117,6 +327,12 @@ export default function AdminPage() {
                             <option value="receptionist">Receptionist</option>
                             <option value="admin">Admin</option>
                           </select>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          <div className="flex items-center gap-3">
+                            <span className="capitalize">{user.subscription?.plan || 'free'}</span>
+                            <button onClick={() => handleUpdateSubscription(user._id)} className="px-2 py-1 text-xs bg-yellow-100 rounded">Manage</button>
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -175,6 +391,13 @@ export default function AdminPage() {
                         <Check size={14} />
                         Active
                       </span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 uppercase font-semibold">Subscription</p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-sm text-gray-700 capitalize">{user.subscription?.plan || 'free'}</span>
+                      <button onClick={() => handleUpdateSubscription(user._id)} className="px-3 py-1 text-xs bg-yellow-100 rounded">Manage</button>
                     </div>
                   </div>
                   <button

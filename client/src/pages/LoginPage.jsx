@@ -43,7 +43,18 @@ export default function LoginPage({ expectedRole = null }) {
       }
 
       dispatch(loginSuccess(response.data));
-      navigate('/dashboard');
+
+      // Redirect to role-specific dashboard
+      const userRole = response.data?.user?.role;
+      if (userRole === 'patient') {
+        navigate('/patient-dashboard');
+      } else if (userRole === 'doctor') {
+        navigate('/doctor-dashboard');
+      } else if (userRole === 'receptionist') {
+        navigate('/receptionist-dashboard');
+      } else {
+        navigate('/admin'); // Default to admin for admin role
+      }
     } catch (error) {
       const errorMessage = error.data?.message || 'Login failed. Please try again.';
       setServerError(errorMessage);

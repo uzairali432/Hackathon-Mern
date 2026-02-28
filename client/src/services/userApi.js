@@ -50,6 +50,31 @@ export const userApi = createApi({
         body: { role },
       }),
     }),
+    updateSubscription: builder.mutation({
+      query: ({ userId, plan, status, expiresAt }) => ({
+        url: `/users/${userId}/subscription`,
+        method: 'PATCH',
+        body: { plan, status, expiresAt },
+      }),
+    }),
+    getAnalytics: builder.query({
+      query: () => ({
+        url: '/users/analytics',
+        method: 'GET',
+      }),
+    }),
+    getSystemUsage: builder.query({
+      query: () => ({
+        url: '/users/system/usage',
+        method: 'GET',
+      }),
+    }),
+    getSystemHealth: builder.query({
+      query: () => ({
+        url: '/users/system/health',
+        method: 'GET',
+      }),
+    }),
     deactivateAccount: builder.mutation({
       query: () => ({
         url: '/users/deactivate',
@@ -73,4 +98,8 @@ export const {
   useUpdateUserRoleMutation,
   useDeactivateAccountMutation,
   useDeleteUserMutation,
+  useUpdateSubscriptionMutation,
+  useGetAnalyticsQuery,
+  useGetSystemUsageQuery,
+  useGetSystemHealthQuery,
 } = userApi;

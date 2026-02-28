@@ -20,6 +20,20 @@ export default function ProfilePage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Get dashboard URL based on role
+  const getDashboardUrl = () => {
+    switch (user?.role) {
+      case 'patient':
+        return '/patient-dashboard';
+      case 'doctor':
+        return '/doctor-dashboard';
+      case 'receptionist':
+        return '/receptionist-dashboard';
+      default:
+        return '/admin';
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -53,7 +67,7 @@ export default function ProfilePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 h-16">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate(getDashboardUrl())}
               className="p-2 hover:bg-gray-100 rounded-md transition-colors flex-shrink-0"
             >
               <ArrowLeft size={20} />
@@ -146,7 +160,7 @@ export default function ProfilePage() {
               </button>
               <button
                 type="button"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate(getDashboardUrl())}
                 className="flex-1 px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium transition-colors"
               >
                 Cancel

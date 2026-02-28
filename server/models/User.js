@@ -47,6 +47,11 @@ const userSchema = new mongoose.Schema(
       default: '',
       maxlength: [500, 'Bio cannot exceed 500 characters'],
     },
+    subscription: {
+      plan: { type: String, enum: ['free', 'basic', 'pro'], default: 'free' },
+      status: { type: String, enum: ['active', 'inactive', 'past_due'], default: 'inactive' },
+      expiresAt: { type: Date, default: null },
+    },
     isActive: {
       type: Boolean,
       default: true,

@@ -5,7 +5,9 @@ import { ProtectedRoute } from './routes/ProtectedRoute';
 import { AdminRoute } from './routes/AdminRoute';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-import DashboardPage from './pages/DashboardPage';
+import PatientDashboard from './pages/PatientDashboard';
+import DoctorDashboard from './pages/DoctorDashboard';
+import ReceptionistDashboard from './pages/ReceptionistDashboard';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import AdminPage from './pages/AdminPage';
@@ -23,12 +25,28 @@ export default function App() {
           <Route path="/login/receptionist" element={<LoginPage expectedRole={'receptionist'} />} />
           <Route path="/signup" element={<SignupPage />} />
 
-          {/* Protected Routes */}
+          {/* Protected Routes - Role-Specific Dashboards */}
           <Route
-            path="/dashboard"
+            path="/patient-dashboard"
             element={
               <ProtectedRoute>
-                <DashboardPage />
+                <PatientDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/doctor-dashboard"
+            element={
+              <ProtectedRoute>
+                <DoctorDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/receptionist-dashboard"
+            element={
+              <ProtectedRoute>
+                <ReceptionistDashboard />
               </ProtectedRoute>
             }
           />
@@ -59,8 +77,8 @@ export default function App() {
             }
           />
 
-          {/* Redirect root to dashboard */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* Redirect root to login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
           {/* 404 Route */}
           <Route path="*" element={<NotFoundPage />} />
