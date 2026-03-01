@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lightbulb, AlertCircle, Search } from 'lucide-react';
+import { Lightbulb, AlertCircle, Search, FileText } from 'lucide-react';
 import axios from 'axios';
 
 export default function AIAssistance({ patientId = null }) {
@@ -54,18 +54,21 @@ export default function AIAssistance({ patientId = null }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-1">
-          <Lightbulb size={20} className="text-yellow-600" /> Smart Symptom Checker
-        </h3>
-        <p className="text-sm text-gray-600">
-          Enhanced AI-assisted diagnosis with patient history, risk levels, and suggested tests
-        </p>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200/50 p-6 space-y-6 hover:shadow-md transition-all duration-300">
+      <div className="flex items-start gap-4">
+        <div className="p-3 bg-gradient-to-br from-yellow-100 to-amber-50 rounded-xl">
+          <Lightbulb size={24} className="text-yellow-600" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-xl font-bold text-gray-900 mb-1">Smart Symptom Checker</h3>
+          <p className="text-sm text-gray-600">
+            Enhanced AI-assisted diagnosis with patient history, risk levels, and suggested tests
+          </p>
+        </div>
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleGetSuggestions} className="space-y-4 bg-blue-50 p-4 rounded-lg">
+      <form onSubmit={handleGetSuggestions} className="space-y-4 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
         {/* Symptoms */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -128,10 +131,19 @@ export default function AIAssistance({ patientId = null }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none"
         >
-          <Search size={16} />
-          {loading ? 'Analyzing...' : 'Get AI Suggestions'}
+          {loading ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+              <span>Analyzing...</span>
+            </>
+          ) : (
+            <>
+              <Search size={18} />
+              <span>Get AI Suggestions</span>
+            </>
+          )}
         </button>
       </form>
 
@@ -165,33 +177,46 @@ export default function AIAssistance({ patientId = null }) {
 
       {/* Risk Level */}
       {suggestions?.riskLevel && (
-        <div className={`p-4 rounded-lg border-2 ${
-          suggestions.riskLevel === 'Critical' ? 'bg-red-50 border-red-300' :
-          suggestions.riskLevel === 'High' ? 'bg-orange-50 border-orange-300' :
-          suggestions.riskLevel === 'Medium' ? 'bg-yellow-50 border-yellow-300' :
-          'bg-green-50 border-green-300'
+        <div className={`p-5 rounded-xl border-2 shadow-sm animate-fade-in-up ${
+          suggestions.riskLevel === 'Critical' ? 'bg-gradient-to-r from-red-50 to-pink-50 border-red-300' :
+          suggestions.riskLevel === 'High' ? 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-300' :
+          suggestions.riskLevel === 'Medium' ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300' :
+          'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300'
         }`}>
-          <div className="flex items-center gap-2">
-            <AlertCircle size={20} className={
-              suggestions.riskLevel === 'Critical' ? 'text-red-600' :
-              suggestions.riskLevel === 'High' ? 'text-orange-600' :
-              suggestions.riskLevel === 'Medium' ? 'text-yellow-600' :
-              'text-green-600'
-            } />
-            <h4 className="font-semibold text-gray-900">Risk Level: <span className="capitalize">{suggestions.riskLevel}</span></h4>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${
+              suggestions.riskLevel === 'Critical' ? 'bg-red-100' :
+              suggestions.riskLevel === 'High' ? 'bg-orange-100' :
+              suggestions.riskLevel === 'Medium' ? 'bg-yellow-100' :
+              'bg-green-100'
+            }`}>
+              <AlertCircle size={24} className={
+                suggestions.riskLevel === 'Critical' ? 'text-red-600' :
+                suggestions.riskLevel === 'High' ? 'text-orange-600' :
+                suggestions.riskLevel === 'Medium' ? 'text-yellow-600' :
+                'text-green-600'
+              } />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Risk Assessment</p>
+              <h4 className="text-xl font-bold text-gray-900 capitalize">{suggestions.riskLevel}</h4>
+            </div>
           </div>
         </div>
       )}
 
       {/* Suggested Tests */}
       {suggestions?.suggestedTests && suggestions.suggestedTests.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-900 mb-2">Suggested Diagnostic Tests:</h4>
-          <ul className="space-y-1">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 shadow-sm">
+          <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <FileText size={18} className="text-blue-600" />
+            Suggested Diagnostic Tests
+          </h4>
+          <ul className="space-y-2">
             {suggestions.suggestedTests.map((test, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
-                <span className="text-blue-600 font-bold">•</span>
-                <span>{test}</span>
+              <li key={idx} className="flex items-start gap-3 p-2 bg-white rounded-lg">
+                <span className="text-blue-600 font-bold mt-0.5">•</span>
+                <span className="text-sm text-gray-700 font-medium">{test}</span>
               </li>
             ))}
           </ul>
