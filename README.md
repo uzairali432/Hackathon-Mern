@@ -4,8 +4,7 @@ A comprehensive, enterprise-grade MERN (MongoDB, Express, React, Node.js) boiler
 
 ## Features
 
-### Backend
-- **Express.js** - Lightweight and flexible Node.js framework
+### Back
 - **MongoDB & Mongoose** - NoSQL database with strong schema validation
 - **JWT Authentication** - Secure token-based authentication with refresh tokens
 - **Role-Based Access Control (RBAC)** - User and Admin roles with middleware
