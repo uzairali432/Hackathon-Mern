@@ -45,102 +45,102 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-gradient-to-br from-blue-50 via-white to-teal-50">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-medscape-light">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+            <div className="w-14 h-14 bg-medscape-navy rounded-md flex items-center justify-center shadow-clinical">
               <UserCheck className="w-7 h-7 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Join MediCare</h1>
-          <p className="text-gray-600 text-sm">Create your healthcare account in seconds</p>
+          <h1 className="text-3xl font-bold text-medscape-navy mb-2">Create Account</h1>
+          <p className="text-medscape-gray text-sm">Register for clinical platform access</p>
         </div>
 
         {/* Error Alert */}
         {serverError && (
-          <div className="mb-6 p-4 bg-red-50/80 border border-red-200 rounded-xl flex items-start gap-3 backdrop-blur-sm">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-700">{serverError}</p>
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-error">{serverError}</p>
           </div>
         )}
 
         {/* Signup Form Card */}
-        <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-8">
+        <div className="bg-white shadow-soft p-8 border border-medscape-border rounded-lg">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               {/* First Name */}
               <div>
-                <label htmlFor="firstName" className="block text-sm font-semibold text-gray-800 mb-2.5">
+                <label htmlFor="firstName" className="block text-sm font-semibold text-medscape-text mb-2">
                   First Name
                 </label>
                 <div className="relative group">
-                  <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                  <User className="absolute left-3 top-3 w-5 h-5 text-medscape-gray group-focus-within:text-medscape-blue transition-colors" />
                   <input
                     id="firstName"
                     type="text"
                     placeholder="John"
                     {...register('firstName')}
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
+                    className="w-full pl-10 pr-4 py-2.5 border border-medscape-border rounded-md text-medscape-text placeholder-medscape-gray focus:border-medscape-blue focus:ring-2 focus:ring-blue-100 transition-all focus:outline-none"
                   />
                 </div>
                 {errors.firstName && (
-                  <p className="mt-2 text-sm text-red-600 font-medium">{errors.firstName.message}</p>
+                  <p className="mt-1.5 text-sm text-error font-medium">{errors.firstName.message}</p>
                 )}
               </div>
 
               {/* Last Name */}
               <div>
-                <label htmlFor="lastName" className="block text-sm font-semibold text-gray-800 mb-2.5">
+                <label htmlFor="lastName" className="block text-sm font-semibold text-medscape-text mb-2">
                   Last Name
                 </label>
                 <div className="relative group">
-                  <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                  <User className="absolute left-3 top-3 w-5 h-5 text-medscape-gray group-focus-within:text-medscape-blue transition-colors" />
                   <input
                     id="lastName"
                     type="text"
                     placeholder="Doe"
                     {...register('lastName')}
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
+                    className="w-full pl-10 pr-4 py-2.5 border border-medscape-border rounded-md text-medscape-text placeholder-medscape-gray focus:border-medscape-blue focus:ring-2 focus:ring-blue-100 transition-all focus:outline-none"
                   />
                 </div>
                 {errors.lastName && (
-                  <p className="mt-2 text-sm text-red-600 font-medium">{errors.lastName.message}</p>
+                  <p className="mt-1.5 text-sm text-error font-medium">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2.5">
+              <label htmlFor="email" className="block text-sm font-semibold text-medscape-text mb-2">
                 Email Address
               </label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                <Mail className="absolute left-3 top-3 w-5 h-5 text-medscape-gray group-focus-within:text-medscape-blue transition-colors" />
                 <input
                   id="email"
                   type="email"
-                  placeholder="doctor@medicare.com"
+                  placeholder="doctor@clinic.com"
                   {...register('email')}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 border border-medscape-border rounded-md text-medscape-text placeholder-medscape-gray focus:border-medscape-blue focus:ring-2 focus:ring-blue-100 transition-all focus:outline-none"
                 />
               </div>
               {errors.email && (
-                <p className="mt-2 text-sm text-red-600 font-medium">{errors.email.message}</p>
+                <p className="mt-1.5 text-sm text-error font-medium">{errors.email.message}</p>
               )}
             </div>
 
             {/* Role Field */}
             <div>
-              <label htmlFor="role" className="block text-sm font-semibold text-gray-800 mb-2.5">
-                Account Type
+              <label htmlFor="role" className="block text-sm font-semibold text-medscape-text mb-2">
+                Role
               </label>
               <select
                 id="role"
                 {...register('role')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none appearance-none cursor-pointer"
+                className="w-full px-4 py-2.5 border border-medscape-border rounded-md text-medscape-text bg-white focus:border-medscape-blue focus:ring-2 focus:ring-blue-100 transition-all focus:outline-none appearance-none cursor-pointer"
               >
                 <option value="patient">Patient</option>
                 <option value="doctor">Doctor</option>
@@ -148,27 +148,27 @@ export default function SignupPage() {
                 <option value="admin">Admin</option>
               </select>
               {errors.role && (
-                <p className="mt-2 text-sm text-red-600 font-medium">{errors.role.message}</p>
+                <p className="mt-1.5 text-sm text-error font-medium">{errors.role.message}</p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-800 mb-2.5">
+              <label htmlFor="password" className="block text-sm font-semibold text-medscape-text mb-2">
                 Password
               </label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                <Lock className="absolute left-3 top-3 w-5 h-5 text-medscape-gray group-focus-within:text-medscape-blue transition-colors" />
                 <input
                   id="password"
                   type="password"
                   placeholder="••••••••"
                   {...register('password')}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 border border-medscape-border rounded-md text-medscape-text placeholder-medscape-gray focus:border-medscape-blue focus:ring-2 focus:ring-blue-100 transition-all focus:outline-none"
                 />
               </div>
               {errors.password && (
-                <p className="mt-2 text-sm text-red-600 font-medium">{errors.password.message}</p>
+                <p className="mt-1.5 text-sm text-error font-medium">{errors.password.message}</p>
               )}
             </div>
 
@@ -176,11 +176,11 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              className="w-full py-2.5 px-4 bg-medscape-navy text-white font-semibold rounded-md hover:bg-primary focus:outline-none focus:ring-2 focus:ring-medscape-blue focus:ring-offset-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6 shadow-soft hover:shadow-clinical"
             >
               {isLoading ? (
                 <>
-                  <Loader className="w-5 h-5 animate-spin" />
+                  <Loader className="w-4 h-4 animate-spin" />
                   <span>Creating Account...</span>
                 </>
               ) : (
@@ -192,27 +192,27 @@ export default function SignupPage() {
 
         {/* Divider */}
         <div className="my-6 flex items-center gap-3">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-sm text-gray-500 font-medium">Already have an account?</span>
-          <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 h-px bg-medscape-border"></div>
+          <span className="text-sm text-medscape-gray font-medium">Have an account?</span>
+          <div className="flex-1 h-px bg-medscape-border"></div>
         </div>
 
         {/* Sign In Link */}
         <Link
           to="/login"
-          className="w-full py-3 px-4 border-2 border-blue-200 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-center hover:border-blue-300"
+          className="w-full py-2.5 px-4 border border-medscape-border text-medscape-navy font-semibold rounded-md hover:bg-medscape-light focus:outline-none focus:ring-2 focus:ring-medscape-blue focus:ring-offset-2 transition-all text-center"
         >
-          Sign In Instead
+          Sign In
         </Link>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-xs text-gray-500">
+        <p className="mt-6 text-center text-xs text-medscape-gray">
           By creating an account, you agree to our{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <a href="#" className="text-medscape-blue hover:text-primary font-semibold">
             Terms of Service
           </a>
           {' '}and{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <a href="#" className="text-medscape-blue hover:text-primary font-semibold">
             Privacy Policy
           </a>
         </p>

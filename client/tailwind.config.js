@@ -6,29 +6,40 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Healthcare-focused color palette
-        primary: '#0369a1', // Medical blue
-        secondary: '#0d9488', // Teal for health/wellness
-        accent: '#06b6d4', // Cyan for highlights
-        success: '#059669', // Medical green
-        error: '#dc2626', // Alert red
-        warning: '#f97316', // Warning orange
+        // Medscape-inspired professional medical colors
+        primary: '#1f3a70', // Deep navy blue (Medscape signature)
+        secondary: '#2c5aa0', // Professional medical blue
+        accent: '#0066cc', // Bright clinical blue
+        success: '#28a745', // Clinical success green
+        error: '#dc3545', // Medical alert red
+        warning: '#ffc107', // Clinical warning yellow
         
-        // Semantic colors
-        'medical-dark': '#0c2340', // Dark medical blue
-        'medical-light': '#e0f2fe', // Light medical blue
-        'health-accent': '#10b981', // Health green
-        'chart-primary': '#0284c7', // Chart blue
-        'chart-secondary': '#0891b2', // Chart cyan
+        // Extended Medscape palette
+        'medscape-navy': '#1f3a70', // Primary dark blue
+        'medscape-blue': '#2c5aa0', // Secondary professional blue
+        'medscape-light': '#f8f9fa', // Off-white background
+        'medscape-gray': '#6c757d', // Professional gray
+        'medscape-border': '#dee2e6', // Light gray borders
+        'medscape-text': '#212529', // Dark text
+        'clinical-accent': '#0066cc', // Clinical action color
       },
       borderRadius: {
-        'xl': '0.75rem',
-        '2xl': '1rem',
+        'sm': '0.25rem',
+        'md': '0.375rem',
+        'lg': '0.5rem',
       },
       boxShadow: {
-        'soft': '0 1px 3px rgba(0, 0, 0, 0.08)',
-        'md-soft': '0 4px 6px rgba(0, 0, 0, 0.05)',
-        'lg-soft': '0 10px 15px rgba(0, 0, 0, 0.05)',
+        'subtle': '0 1px 2px rgba(31, 58, 112, 0.05)',
+        'soft': '0 2px 4px rgba(31, 58, 112, 0.08)',
+        'clinical': '0 4px 8px rgba(31, 58, 112, 0.1)',
+      },
+      fontSize: {
+        'xs': ['12px', '16px'],
+        'sm': ['14px', '20px'],
+        'base': ['15px', '24px'],
+        'lg': ['17px', '28px'],
+        'xl': ['20px', '28px'],
+        '2xl': ['24px', '32px'],
       },
     },
   },

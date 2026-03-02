@@ -61,27 +61,27 @@ export default function LoginPage({ expectedRole = null }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-gradient-to-br from-blue-50 via-white to-teal-50">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-medscape-light">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+            <div className="w-14 h-14 bg-medscape-navy rounded-md flex items-center justify-center shadow-clinical">
               <Heart className="w-7 h-7 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-medscape-navy mb-2">
             MediCare Hub
           </h1>
-          <p className="text-gray-600 text-sm">Professional Medical Management System</p>
+          <p className="text-medscape-gray text-sm">Clinical Medical Management System</p>
           {expectedRole && (
-            <p className="text-blue-600 font-medium mt-3 text-sm">Sign in as {expectedRole}</p>
+            <p className="text-medscape-blue font-medium mt-3 text-sm">Sign in as {expectedRole}</p>
           )}
         </div>
 
         {/* Error Alert */}
         {serverError && (
-          <div className="mb-6 p-4 bg-red-50/80 border border-red-200 rounded-xl flex items-start gap-3 backdrop-blur-sm">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-700">{serverError}</p>
           </div>
@@ -89,52 +89,52 @@ export default function LoginPage({ expectedRole = null }) {
 
         {/* Success Alert */}
         {successMessage && (
-          <div className="mb-6 p-4 bg-green-50/80 border border-green-200 rounded-xl flex items-start gap-3 backdrop-blur-sm">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-green-700">{successMessage}</p>
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-success">{successMessage}</p>
           </div>
         )}
 
         {/* Login Form Card */}
-        <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-8">
+        <div className="bg-white shadow-soft p-8 border border-medscape-border rounded-lg">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2.5">
+              <label htmlFor="email" className="block text-sm font-semibold text-medscape-text mb-2">
                 Email Address
               </label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                <Mail className="absolute left-3 top-3.5 w-5 h-5 text-medscape-gray group-focus-within:text-medscape-blue transition-colors" />
                 <input
                   id="email"
                   type="email"
-                  placeholder="doctor@medicare.com"
+                  placeholder="doctor@clinic.com"
                   {...register('email')}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 border border-medscape-border rounded-md text-medscape-text placeholder-medscape-gray focus:border-medscape-blue focus:ring-2 focus:ring-blue-100 transition-all focus:outline-none"
                 />
               </div>
               {errors.email && (
-                <p className="mt-2 text-sm text-red-600 font-medium">{errors.email.message}</p>
+                <p className="mt-1.5 text-sm text-error font-medium">{errors.email.message}</p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-800 mb-2.5">
+              <label htmlFor="password" className="block text-sm font-semibold text-medscape-text mb-2">
                 Password
               </label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                <Lock className="absolute left-3 top-3.5 w-5 h-5 text-medscape-gray group-focus-within:text-medscape-blue transition-colors" />
                 <input
                   id="password"
                   type="password"
                   placeholder="••••••••"
                   {...register('password')}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 border border-medscape-border rounded-md text-medscape-text placeholder-medscape-gray focus:border-medscape-blue focus:ring-2 focus:ring-blue-100 transition-all focus:outline-none"
                 />
               </div>
               {errors.password && (
-                <p className="mt-2 text-sm text-red-600 font-medium">{errors.password.message}</p>
+                <p className="mt-1.5 text-sm text-error font-medium">{errors.password.message}</p>
               )}
             </div>
 
@@ -142,15 +142,15 @@ export default function LoginPage({ expectedRole = null }) {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              className="w-full py-2.5 px-4 bg-medscape-navy text-white font-semibold rounded-md hover:bg-primary focus:outline-none focus:ring-2 focus:ring-medscape-blue focus:ring-offset-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6 shadow-soft hover:shadow-clinical"
             >
               {isLoading ? (
                 <>
-                  <Loader className="w-5 h-5 animate-spin" />
+                  <Loader className="w-4 h-4 animate-spin" />
                   <span>Signing in...</span>
                 </>
               ) : (
-                <span>Sign In Securely</span>
+                <span>Sign In</span>
               )}
             </button>
           </form>
@@ -158,27 +158,27 @@ export default function LoginPage({ expectedRole = null }) {
 
         {/* Divider */}
         <div className="my-6 flex items-center gap-3">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-sm text-gray-500 font-medium">Don't have an account?</span>
-          <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 h-px bg-medscape-border"></div>
+          <span className="text-sm text-medscape-gray font-medium">New to system?</span>
+          <div className="flex-1 h-px bg-medscape-border"></div>
         </div>
 
         {/* Sign Up Link */}
         <Link
           to="/signup"
-          className="w-full py-3 px-4 border-2 border-blue-200 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-center hover:border-blue-300"
+          className="w-full py-2.5 px-4 border border-medscape-border text-medscape-navy font-semibold rounded-md hover:bg-medscape-light focus:outline-none focus:ring-2 focus:ring-medscape-blue focus:ring-offset-2 transition-all text-center"
         >
-          Create New Account
+          Create Account
         </Link>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-xs text-gray-500">
+        <p className="mt-6 text-center text-xs text-medscape-gray">
           By signing in, you agree to our{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <a href="#" className="text-medscape-blue hover:text-primary font-semibold">
             Terms of Service
           </a>
           {' '}and{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <a href="#" className="text-medscape-blue hover:text-primary font-semibold">
             Privacy Policy
           </a>
         </p>

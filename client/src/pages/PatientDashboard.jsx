@@ -27,24 +27,24 @@ export default function PatientDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50">
+    <div className="min-h-screen bg-medscape-light">
       {/* Header */}
-      <nav className="bg-white/95 backdrop-blur-lg shadow-sm sticky top-0 z-50 border-b border-gray-100">
+      <nav className="bg-white shadow-subtle sticky top-0 z-50 border-b border-medscape-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 h-auto sm:h-16 py-3 sm:py-0">
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-teal-600 flex items-center justify-center shadow-lg">
-                <Heart className="text-white" size={22} />
+              <div className="w-10 h-10 rounded-md bg-medscape-navy flex items-center justify-center shadow-subtle">
+                <Heart className="text-white" size={20} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Patient Portal</h1>
-                <p className="text-xs text-gray-500">Welcome back, {user?.firstName}!</p>
+                <h1 className="text-2xl font-bold text-medscape-navy">Patient Dashboard</h1>
+                <p className="text-xs text-medscape-gray">Welcome, {user?.firstName}!</p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
               <div className="flex items-center gap-3">
                 {user?.role && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 capitalize border border-green-200">
+                  <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold bg-blue-100 text-medscape-navy capitalize border border-medscape-border">
                     {user.role}
                   </span>
                 )}
@@ -52,7 +52,7 @@ export default function PatientDashboard() {
               <button
                 onClick={handleLogout}
                 disabled={isLoading}
-                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200 disabled:opacity-50 transition-all duration-200"
+                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-medscape-text bg-medscape-border hover:bg-medscape-gray hover:text-white disabled:opacity-50 transition-all duration-200"
               >
                 <LogOut size={18} />
                 <span className="hidden sm:inline">{isLoading ? 'Signing out...' : 'Sign Out'}</span>
@@ -76,7 +76,7 @@ export default function PatientDashboard() {
         {/* Quick Actions Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Appointments Card */}
-          <div className="group bg-white rounded-2xl shadow-lg border border-gray-100 p-7 hover:shadow-2xl hover:border-blue-300 transition-all duration-300 transform hover:-translate-y-1">
+          <div className="group bg-white rounded-lg shadow-soft border border-medscape-border p-6 hover:shadow-clinical transition-all duration-200">
             <div className="flex items-start justify-between mb-5">
               <div className="p-4 bg-blue-100 rounded-xl group-hover:scale-110 transition-transform duration-300">
                 <Calendar className="text-blue-600" size={28} />
