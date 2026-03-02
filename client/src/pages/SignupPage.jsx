@@ -45,170 +45,174 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-gradient-to-br from-blue-50 via-white to-teal-50">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-              <UserCheck className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+              <UserCheck className="w-7 h-7 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
-          <p className="text-gray-600">Join us and get started in seconds</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Join MediCare</h1>
+          <p className="text-gray-600 text-sm">Create your healthcare account in seconds</p>
         </div>
 
         {/* Error Alert */}
         {serverError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <div className="mb-6 p-4 bg-red-50/80 border border-red-200 rounded-xl flex items-start gap-3 backdrop-blur-sm">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-700">{serverError}</p>
           </div>
         )}
 
-        {/* Signup Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Name Fields */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* First Name */}
+        {/* Signup Form Card */}
+        <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Name Fields */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* First Name */}
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-semibold text-gray-800 mb-2.5">
+                  First Name
+                </label>
+                <div className="relative group">
+                  <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                  <input
+                    id="firstName"
+                    type="text"
+                    placeholder="John"
+                    {...register('firstName')}
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
+                  />
+                </div>
+                {errors.firstName && (
+                  <p className="mt-2 text-sm text-red-600 font-medium">{errors.firstName.message}</p>
+                )}
+              </div>
+
+              {/* Last Name */}
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-semibold text-gray-800 mb-2.5">
+                  Last Name
+                </label>
+                <div className="relative group">
+                  <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                  <input
+                    id="lastName"
+                    type="text"
+                    placeholder="Doe"
+                    {...register('lastName')}
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
+                  />
+                </div>
+                {errors.lastName && (
+                  <p className="mt-2 text-sm text-red-600 font-medium">{errors.lastName.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Email Field */}
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                First Name
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2.5">
+                Email Address
               </label>
-              <div className="relative">
-                <User className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                 <input
-                  id="firstName"
-                  type="text"
-                  placeholder="John"
-                  {...register('firstName')}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                  id="email"
+                  type="email"
+                  placeholder="doctor@medicare.com"
+                  {...register('email')}
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
                 />
               </div>
-              {errors.firstName && (
-                <p className="mt-1.5 text-sm text-red-600">{errors.firstName.message}</p>
+              {errors.email && (
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.email.message}</p>
               )}
             </div>
 
-            {/* Last Name */}
+            {/* Role Field */}
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                Last Name
+              <label htmlFor="role" className="block text-sm font-semibold text-gray-800 mb-2.5">
+                Account Type
               </label>
-              <input
-                id="lastName"
-                type="text"
-                placeholder="Doe"
-                {...register('lastName')}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-              />
-              {errors.lastName && (
-                <p className="mt-1.5 text-sm text-red-600">{errors.lastName.message}</p>
+              <select
+                id="role"
+                {...register('role')}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none appearance-none cursor-pointer"
+              >
+                <option value="patient">Patient</option>
+                <option value="doctor">Doctor</option>
+                <option value="receptionist">Receptionist</option>
+                <option value="admin">Admin</option>
+              </select>
+              {errors.role && (
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.role.message}</p>
               )}
             </div>
-          </div>
 
-          {/* Email Field */}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
-              <input
-                id="email"
-                type="email"
-                placeholder=""
-                {...register('email')}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-              />
+            {/* Password Field */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-800 mb-2.5">
+                Password
+              </label>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  {...register('password')}
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all focus:outline-none"
+                />
+              </div>
+              {errors.password && (
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.password.message}</p>
+              )}
             </div>
-            {errors.email && (
-              <p className="mt-1.5 text-sm text-red-600">{errors.email.message}</p>
-            )}
-          </div>
 
-          {/* Role Field */}
-          <div>
-            <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-              Role
-            </label>
-            <select
-              id="role"
-              {...register('role')}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
             >
-              <option value="patient">Patient</option>
-              <option value="user">User</option>
-              <option value="doctor">Doctor</option>
-              <option value="receptionist">Receptionist</option>
-              <option value="admin">Admin</option>
-            </select>
-            {errors.role && (
-              <p className="mt-1.5 text-sm text-red-600">{errors.role.message}</p>
-            )}
-          </div>
-
-          {/* Password Field */}
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
-              <input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                {...register('password')}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-              />
-            </div>
-            {errors.password && (
-              <p className="mt-1.5 text-sm text-red-600">{errors.password.message}</p>
-            )}
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <Loader className="w-4 h-4 animate-spin" />
-                Creating Account...
-              </>
-            ) : (
-              'Create Account'
-            )}
-          </button>
-        </form>
+              {isLoading ? (
+                <>
+                  <Loader className="w-5 h-5 animate-spin" />
+                  <span>Creating Account...</span>
+                </>
+              ) : (
+                <span>Create Account</span>
+              )}
+            </button>
+          </form>
+        </div>
 
         {/* Divider */}
         <div className="my-6 flex items-center gap-3">
           <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-sm text-gray-500">Already registered?</span>
+          <span className="text-sm text-gray-500 font-medium">Already have an account?</span>
           <div className="flex-1 h-px bg-gray-200"></div>
         </div>
 
         {/* Sign In Link */}
         <Link
           to="/login"
-          className="w-full py-2.5 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-center"
+          className="w-full py-3 px-4 border-2 border-blue-200 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-center hover:border-blue-300"
         >
-          Sign In
+          Sign In Instead
         </Link>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-xs text-gray-600">
+        <p className="mt-8 text-center text-xs text-gray-500">
           By creating an account, you agree to our{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+          <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
             Terms of Service
           </a>
           {' '}and{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+          <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
             Privacy Policy
           </a>
         </p>

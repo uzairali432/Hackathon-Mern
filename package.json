@@ -15,7 +15,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "concurrently": "^9.1.0"
-  },
-  "devDependencies": {}
+    "@hookform/resolvers": "^5.2.2",
+    "concurrently": "^9.1.0",
+    "lucide-react": "^0.576.0",
+    "react": "^19.2.4",
+    "react-hook-form": "^7.71.2",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.13.1",
+    "yup": "^1.7.1"
+  }
 }
