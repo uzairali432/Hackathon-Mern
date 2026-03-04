@@ -12,7 +12,7 @@ pnpm install
 ### Environment Setup
 ```bash
 cp .env.example .env
-# Edit .env with your values
+
 ```
 
 ### Development
@@ -101,7 +101,7 @@ CORS_ORIGIN=http://localhost:5173
 
 ### Middleware
 ```javascript
-// Use authenticate middleware to protect routes
+
 import { authenticate } from './middleware/authenticate.js';
 
 router.get('/protected-route', authenticate, controller);
@@ -109,7 +109,7 @@ router.get('/protected-route', authenticate, controller);
 
 ### Role-Based Access
 ```javascript
-// Use authorize middleware for role checking
+
 import { authorize } from './middleware/authorize.js';
 
 router.post('/admin-only', authenticate, authorize('admin'), controller);
