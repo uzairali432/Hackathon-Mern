@@ -247,6 +247,42 @@ Keep the explanation clear, concise, and easy to understand for a patient.`;
       });
     }
 
+    // Flag 5: High-Risk Combinations
+    const allDiagnoses = diagnoses.map(d => d.condition.toLowerCase());
+    const allMedications = prescriptions.flatMap(p => p.medications.map(m => m.name.toLowerCase()));
+
+    // Combination 1: Diabetes and Hypertension
+    if (allDiagnoses.includes('diabetes') && allDiagnoses.includes('hypertension')) {
+      flags.push({
+        type: 'high_risk_combination',
+        severity: 'high',
+        message: 'Patient has co-diagnoses of Diabetes and Hypertension, which increases cardiovascular risk.',
+        recommendation: 'Ensure blood pressure and blood glucose are closely monitored. Consider a comprehensive cardiovascular risk assessment.',
+      });
+    }
+
+    // Combination 2: Flu diagnosis with antibiotic prescription
+    if (allDiagnoses.some(d => d.includes('flu')) && allMedications.some(m => m.includes('antibiotic'))) {
+        flags.push({
+            type: 'high_risk_combination',
+            severity: 'medium',
+            message: 'Patient diagnosed with flu and prescribed antibiotics. This may indicate a secondary bacterial infection or inappropriate antibiotic use.',
+            recommendation: 'Verify rationale for antibiotic prescription. Ensure viral vs. bacterial infection is clear.',
+        });
+    }
+    
+    // Combination 3: Fall diagnosis in elderly patient (assuming age > 65 for demonstration)
+    // In a real scenario, patient age would be available.
+    if (allDiagnoses.some(d => d.includes('fall'))) {
+        // Assuming we can get patient's age. Here we just add the flag if a fall is diagnosed.
+        flags.push({
+            type: 'high_risk_combination',
+            severity: 'high',
+            message: 'Patient has a recent diagnosis related to a fall. This is a high-risk event for elderly patients.',
+            recommendation: 'Conduct a fall risk assessment. Review medications for side effects like dizziness. Evaluate home safety.',
+        });
+    }
+
     // Use AI to analyze patterns if available
     if (flags.length > 0) {
       try {
