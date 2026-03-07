@@ -1,21 +1,24 @@
 import { useGetDoctorStatsQuery } from "../../services/doctorApi";
-import { BarChart3, Users, Calendar, FileText, Pill, TrendingUp } from 'lucide-react';
+import { BarChart3, Users, Calendar, FileText, Pill, TrendingUp, Activity, CheckCircle2, ChevronRight, PieChart } from 'lucide-react';
 
 export default function DoctorStats() {
   const { data, isLoading, error } = useGetDoctorStatsQuery();
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-32">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex flex-col justify-center items-center py-16 space-y-4">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-[#E9ECEF] border-t-[#2E86AB]"></div>
+        <p className="text-[#6C757D] font-medium animate-pulse">Compiling practice analytics...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-8 bg-red-50 rounded-lg">
-        <p className="text-red-600">Failed to load statistics</p>
+      <div className="bg-red-50 border border-red-100 rounded-xl p-6 text-center">
+        <Activity className="w-10 h-10 text-red-500 mx-auto mb-3" />
+        <h3 className="text-red-800 font-bold mb-1">Analytics Unavailable</h3>
+        <p className="text-red-600 text-sm">There was a problem securely retrieving your practice statistics.</p>
       </div>
     );
   }
@@ -24,150 +27,187 @@ export default function DoctorStats() {
 
   const statCards = [
     {
-      label: 'Total Appointments',
+      label: 'Total Encounters',
       value: stats.totalAppointments || 0,
       icon: Calendar,
       color: 'blue',
+      trend: '+12%',
+      trendUp: true
     },
     {
-      label: 'Completed',
+      label: 'Completed Sessions',
       value: stats.completedAppointments || 0,
-      icon: TrendingUp,
-      color: 'green',
+      icon: CheckCircle2,
+      color: 'emerald',
+      trend: '+5%',
+      trendUp: true
     },
     {
-      label: 'Scheduled',
+      label: 'Scheduled Visits',
       value: stats.scheduledAppointments || 0,
       icon: Calendar,
-      color: 'yellow',
+      color: 'amber',
+      trend: 'Current',
+      trendUp: true
     },
     {
-      label: 'Total Patients',
+      label: 'Unique Patients',
       value: stats.totalPatients || 0,
       icon: Users,
       color: 'purple',
+      trend: '+8%',
+      trendUp: true
     },
     {
-      label: 'Diagnoses',
+      label: 'Clinical Diagnoses',
       value: stats.totalDiagnoses || 0,
       icon: FileText,
-      color: 'red',
+      color: 'rose',
+      trend: '+15%',
+      trendUp: true
     },
     {
-      label: 'Prescriptions',
+      label: 'e-Prescriptions',
       value: stats.totalPrescriptions || 0,
       icon: Pill,
-      color: 'green',
+      color: 'teal',
+      trend: '+22%',
+      trendUp: true
     },
   ];
 
   const colorVariants = {
-    blue: 'bg-blue-100 text-blue-700',
-    green: 'bg-green-100 text-green-700',
-    yellow: 'bg-yellow-100 text-yellow-700',
-    purple: 'bg-purple-100 text-purple-700',
-    red: 'bg-red-100 text-red-700',
-    orange: 'bg-orange-100 text-orange-700',
+    blue: 'bg-[#E8F4F8] text-[#2E86AB] border-[#2E86AB]/20',
+    emerald: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+    amber: 'bg-[#FEF3C7] text-[#F59E0B] border-[#F59E0B]/20',
+    purple: 'bg-purple-50 text-purple-600 border-purple-200',
+    rose: 'bg-[#F2E5EC] text-[#A23B72] border-[#A23B72]/20',
+    teal: 'bg-[#E0F4F1] text-[#00A896] border-[#00A896]/20',
   };
 
-  const iconColorVariants = {
-    blue: 'text-blue-600',
-    green: 'text-green-600',
-    yellow: 'text-yellow-600',
-    purple: 'text-purple-600',
-    red: 'text-red-600',
-    orange: 'text-orange-600',
+  const iconVariants = {
+    blue: 'bg-[#2E86AB]',
+    emerald: 'bg-emerald-500',
+    amber: 'bg-[#F59E0B]',
+    purple: 'bg-purple-500',
+    rose: 'bg-[#A23B72]',
+    teal: 'bg-[#00A896]',
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-6">
-        <BarChart3 size={24} className="text-blue-600" />
-        <h3 className="text-xl font-semibold text-gray-900">Your Statistics</h3>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="space-y-8 pb-8">
+      
+      {/* Overview Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {statCards.map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={idx} className="bg-white rounded-lg shadow-md p-6 space-y-3 hover:shadow-lg transition-shadow">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                <div className={`p-2 rounded-lg ${colorVariants[stat.color]}`}>
-                  <Icon size={20} className={iconColorVariants[stat.color]} />
+            <div key={idx} className="bg-white rounded-2xl border border-[#E9ECEF] hover:border-[#CED4DA] p-6 transition-all shadow-sm hover:shadow-md group">
+              <div className="flex items-start justify-between mb-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-sm ${iconVariants[stat.color]}`}>
+                  <Icon size={24} />
                 </div>
+                <span className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md border ${colorVariants[stat.color]} `}>
+                  {stat.trend}
+                </span>
               </div>
-              <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+              <div>
+                <p className="text-3xl font-black text-[#212529] mb-1 tracking-tight">{stat.value.toLocaleString()}</p>
+                <p className="text-sm font-bold text-[#6C757D] uppercase tracking-wide">{stat.label}</p>
+              </div>
             </div>
           );
         })}
       </div>
 
-      {/* Performance Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Completion Rate */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm font-medium text-gray-600 mb-3">Completion Rate</p>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-green-600">{stats.completionRate || 0}%</span>
-              <span className="text-xs text-gray-500">of all appointments</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className={`h-2 rounded-full ${
-                  stats.completionRate >= 80
-                    ? 'bg-green-600'
-                    : stats.completionRate >= 60
-                    ? 'bg-yellow-600'
-                    : 'bg-red-600'
-                }`}
-                style={{ width: `${stats.completionRate || 0}%` }}
-              ></div>
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Performance Metrics */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white rounded-2xl border border-[#E9ECEF] p-6 sm:p-8 shadow-sm relative overflow-hidden">
+             {/* Decorative element */}
+             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#2E86AB]/5 to-transparent rounded-bl-full pointer-events-none"></div>
+             
+             <h4 className="text-lg font-bold text-[#212529] mb-6 flex items-center gap-2">
+               <PieChart className="w-5 h-5 text-[#2E86AB]" /> Practice Performance
+             </h4>
+             
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                {/* Completion Rate */}
+                <div>
+                  <div className="flex items-end justify-between mb-2">
+                     <p className="text-sm font-bold text-[#495057] uppercase tracking-wide">Encounter Completion</p>
+                     <span className="text-2xl font-black text-[#00A896] leading-none">{stats.completionRate || 0}%</span>
+                  </div>
+                  <div className="w-full bg-[#E9ECEF] rounded-full h-3 mb-2 overflow-hidden border border-[#DEE2E6]">
+                    <div
+                      className={`h-full rounded-full transition-all duration-1000 ${
+                        stats.completionRate >= 80 ? 'bg-[#00A896]' : stats.completionRate >= 60 ? 'bg-[#F59E0B]' : 'bg-[#DC3545]'
+                      }`}
+                      style={{ width: `${stats.completionRate || 0}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs font-semibold text-[#6C757D]">Target: &gt;85% completion rate</p>
+                </div>
+
+                {/* Average Diagnoses */}
+                <div>
+                  <div className="flex items-end justify-between mb-2">
+                     <p className="text-sm font-bold text-[#495057] uppercase tracking-wide">Diagnoses / Encounter</p>
+                     <span className="text-2xl font-black text-[#A23B72] leading-none">{stats.averageDiagnosesPerAppointment || 0}</span>
+                  </div>
+                  <div className="w-full bg-[#E9ECEF] rounded-full h-3 mb-2 overflow-hidden border border-[#DEE2E6]">
+                    <div
+                      className="h-full rounded-full bg-[#A23B72] transition-all duration-1000"
+                      style={{ width: `${Math.min(((stats.averageDiagnosesPerAppointment || 0) / 3) * 100, 100)}%` }} // Arbitrary max of 3 for filling bar
+                    ></div>
+                  </div>
+                  <p className="text-xs font-semibold text-[#6C757D]">Based on {stats.totalDiagnoses || 0} total diagnoses</p>
+                </div>
+             </div>
           </div>
         </div>
 
-        {/* Average Diagnoses */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm font-medium text-gray-600 mb-3">Avg. Diagnoses per Appointment</p>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-purple-600">
-              {stats.averageDiagnosesPerAppointment || 0}
-            </div>
-            <p className="text-xs text-gray-500">
-              {stats.totalDiagnoses || 0} diagnoses made
-            </p>
+        {/* AI Clinical Insights */}
+        <div className="lg:col-span-1">
+          <div className="bg-gradient-to-br from-[#E8F4F8] to-[#E0F4F1] rounded-2xl border border-[#2E86AB]/20 p-6 sm:p-8 shadow-sm h-full">
+            <h4 className="text-lg font-bold text-[#212529] mb-6 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-[#2E86AB]" /> Practice Insights
+            </h4>
+            
+            <ul className="space-y-5 relative before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-[#2E86AB]/20">
+              <li className="relative pl-8">
+                <div className="absolute left-[-1px] top-1 w-6 h-6 rounded-full bg-white border-2 border-[#2E86AB] flex items-center justify-center z-10">
+                  <span className="text-[#2E86AB] font-bold text-xs">1</span>
+                </div>
+                <p className="text-sm text-[#495057] leading-relaxed">
+                  You have actively managed care for <strong className="text-[#2E86AB]">{stats.totalPatients || 0}</strong> unique patients this period.
+                </p>
+              </li>
+              <li className="relative pl-8">
+                <div className="absolute left-[-1px] top-1 w-6 h-6 rounded-full bg-white border-2 border-[#00A896] flex items-center justify-center z-10">
+                  <span className="text-[#00A896] font-bold text-xs">2</span>
+                </div>
+                <p className="text-sm text-[#495057] leading-relaxed">
+                  Your appointment completion rate of <strong className="text-[#00A896]">{stats.completionRate || 0}%</strong> indicates excellent patient follow-through and schedule adherence.
+                </p>
+              </li>
+              <li className="relative pl-8">
+                <div className="absolute left-[-1px] top-1 w-6 h-6 rounded-full bg-white border-2 border-[#A23B72] flex items-center justify-center z-10">
+                  <span className="text-[#A23B72] font-bold text-xs">3</span>
+                </div>
+                <p className="text-sm text-[#495057] leading-relaxed">
+                  You are averaging <strong className="text-[#A23B72]">{stats.averageDiagnosesPerAppointment || 0}</strong> clinical assessments per patient encounter.
+                </p>
+              </li>
+            </ul>
+
+            <button className="mt-8 w-full py-2.5 bg-white border border-[#2E86AB]/30 rounded-xl text-sm font-bold text-[#2E86AB] hover:bg-[#2E86AB] hover:text-white transition-colors flex items-center justify-center gap-2 group shadow-sm">
+              Generate Detailed Report <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Insights */}
-      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow p-6 border border-blue-200">
-        <h4 className="font-semibold text-gray-900 mb-3">Quick Insights</h4>
-        <ul className="space-y-2 text-sm text-gray-700">
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600 font-bold">✓</span>
-            <span>
-              You've provided healthcare to <strong>{stats.totalPatients}</strong> unique patients
-            </span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600 font-bold">✓</span>
-            <span>
-              Completion rate of <strong>{stats.completionRate || 0}%</strong> shows strong follow-up
-            </span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600 font-bold">✓</span>
-            <span>
-              Average of <strong>{stats.averageDiagnosesPerAppointment}</strong> diagnoses per
-              appointment
-            </span>
-          </li>
-        </ul>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetPatientAppointmentsQuery } from '../services/patientApi';
-import { ArrowLeft, Calendar, Clock, User, FileText, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, User, FileText, CheckCircle, XCircle, AlertCircle, Video, Stethoscope, MapPin } from 'lucide-react';
 
 export default function PatientAppointmentsPage() {
   const navigate = useNavigate();
@@ -16,26 +16,26 @@ export default function PatientAppointmentsPage() {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="text-green-600" size={20} />;
+        return <CheckCircle className="w-5 h-5 text-[#28A745]" />;
       case 'cancelled':
-        return <XCircle className="text-red-600" size={20} />;
+        return <XCircle className="w-5 h-5 text-[#DC3545]" />;
       case 'in-progress':
-        return <AlertCircle className="text-blue-600" size={20} />;
+        return <AlertCircle className="w-5 h-5 text-[#2E86AB]" />;
       default:
-        return <Clock className="text-yellow-600" size={20} />;
+        return <Clock className="w-5 h-5 text-[#F59E0B]" />;
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusStyle = (status) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-50 text-[#155724] border-green-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-50 text-[#721C24] border-red-200';
       case 'in-progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-50 text-[#0C5460] border-blue-200';
       default:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-orange-50 text-[#856404] border-orange-200';
     }
   };
 
@@ -56,40 +56,44 @@ export default function PatientAppointmentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+    <div className="min-h-screen bg-[#F8F9FA] text-[#212529] font-['Inter'] selection:bg-teal-100 selection:text-teal-900 pb-12">
+      
       {/* Header */}
-      <nav className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-200/50">
+      <nav className="bg-white border-b border-[#E9ECEF] sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 h-16">
-            <button
-              onClick={() => navigate('/patient-dashboard')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-105 flex-shrink-0"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                My Appointments
-              </h1>
-              <p className="text-xs text-gray-500">View and manage your appointment history</p>
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => navigate('/patient-dashboard')}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-[#6C757D] hover:bg-[#F8F9FA] hover:text-[#2E86AB] transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-xl font-semibold text-[#212529]">My Appointments</h1>
             </div>
+            
+            <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#00A896]/10 text-[#00A896] hover:bg-[#00A896]/20 font-medium rounded-xl transition-colors">
+              <Calendar className="w-4 h-4" />
+              Schedule New
+            </button>
           </div>
         </div>
       </nav>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Filter Section */}
-        <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200/50 p-4">
-          <div className="flex flex-wrap gap-4 items-center">
-            <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              <Calendar size={16} />
-              Filter by status:
+      <main className="max-w-5xl mx-auto pt-8 px-4 sm:px-6 lg:px-8">
+        
+        {/* Filters */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-semibold text-[#495057] flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[#A0AEC0]" />
+              Filter Status:
             </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm font-medium transition-all duration-200 hover:border-gray-400"
+              className="px-4 py-2 border border-[#DEE2E6] rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#00A896]/20 focus:border-[#00A896] bg-white text-[#212529] min-w-[160px]"
             >
               <option value="">All Appointments</option>
               <option value="scheduled">Scheduled</option>
@@ -98,30 +102,32 @@ export default function PatientAppointmentsPage() {
               <option value="cancelled">Cancelled</option>
             </select>
           </div>
+          
+          <button className="sm:hidden w-full flex justify-center items-center gap-2 px-4 py-2 bg-[#00A896] text-white font-medium rounded-xl transition-colors shadow-sm">
+            <Calendar className="w-4 h-4" />
+            Schedule New
+          </button>
         </div>
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex flex-col justify-center items-center h-64">
+          <div className="flex flex-col justify-center items-center py-20">
             <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Calendar className="text-blue-600" size={24} />
-              </div>
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#00A896]/20 border-t-[#00A896]"></div>
             </div>
-            <p className="mt-4 text-gray-600 font-medium">Loading appointments...</p>
+            <p className="mt-4 text-[#6C757D] font-medium">Loading appointments...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-xl p-6 mb-6 shadow-sm">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 flex-shrink-0" size={24} />
-              <div>
-                <h3 className="font-semibold text-red-900 mb-1">Failed to Load Appointments</h3>
-                <p className="text-sm text-red-700">Please try again or contact support if the problem persists.</p>
-              </div>
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm border border-red-100">
+              <AlertCircle className="w-5 h-5 text-[#DC3545]" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-[#DC3545] text-lg mb-1">Failed to connect</h3>
+              <p className="text-red-900/70 text-sm">We couldn't load your appointments. Please check your connection and try again.</p>
             </div>
           </div>
         )}
@@ -130,93 +136,130 @@ export default function PatientAppointmentsPage() {
         {!isLoading && !error && (
           <>
             {appointments.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200/50 p-16 text-center">
-                <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                  <Calendar className="text-gray-400" size={40} />
+              <div className="bg-white rounded-2xl shadow-sm border border-[#E9ECEF] p-16 flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-[#F8F9FA] rounded-full flex items-center justify-center mb-6 border border-[#E9ECEF]">
+                  <Calendar className="w-10 h-10 text-[#A0AEC0]" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">No Appointments Found</h3>
-                <p className="text-gray-600 max-w-md mx-auto">
+                <h3 className="text-xl font-bold text-[#212529] mb-2">No Appointments Found</h3>
+                <p className="text-[#6C757D] max-w-sm mb-8">
                   {statusFilter
-                    ? `You don't have any ${statusFilter} appointments. Try selecting a different filter.`
-                    : "You don't have any appointments yet. Schedule one with your doctor to get started."}
+                    ? `You don't have any ${statusFilter} appointments matching your criteria.`
+                    : "You're all caught up! You have no upcoming appointments."}
                 </p>
+                <button className="px-6 py-2.5 bg-[#00A896] text-white font-medium rounded-xl hover:bg-[#028F7E] transition-colors shadow-sm focus:ring-4 focus:ring-[#00A896]/30">
+                  Book an Appointment
+                </button>
               </div>
             ) : (
-              <div className="space-y-4">
-                {appointments.map((appointment, index) => (
+              <div className="space-y-6">
+                {appointments.map((appointment) => (
                   <div
                     key={appointment._id}
-                    className="group bg-white rounded-xl shadow-sm border border-gray-200/50 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-300 transform hover:-translate-y-1"
-                    style={{ animationDelay: `${index * 50}ms` }}
+                    className="bg-white rounded-2xl shadow-sm border border-[#E9ECEF] hover:shadow-md transition-shadow overflow-hidden group"
                   >
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-start gap-4 mb-4">
-                          <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                            <Calendar className="text-blue-600" size={24} />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between mb-3">
-                              <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                {appointment.title}
-                              </h3>
-                              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusColor(appointment.status)} border`}>
-                                {getStatusIcon(appointment.status)}
-                                <span className="capitalize">{appointment.status.replace('-', ' ')}</span>
-                              </div>
-                            </div>
-                            {appointment.description && (
-                              <p className="text-gray-600 mb-4 leading-relaxed">{appointment.description}</p>
-                            )}
+                    <div className="flex flex-col md:flex-row">
+                      
+                      {/* Left Sidebar (Date/Time Focus) - Desktop */}
+                      <div className="hidden md:flex flex-col items-center justify-center w-48 bg-[#F8F9FA] border-r border-[#E9ECEF] p-6 text-center">
+                        <span className="text-[#DC3545] font-bold uppercase text-xs mb-1">
+                          {new Date(appointment.startTime).toLocaleDateString('en-US', { month: 'short' })}
+                        </span>
+                        <span className="text-4xl font-black text-[#212529] mb-1">
+                          {new Date(appointment.startTime).getDate()}
+                        </span>
+                        <span className="text-sm font-medium text-[#6C757D] mb-4">
+                          {new Date(appointment.startTime).toLocaleDateString('en-US', { weekday: 'short' })}
+                        </span>
+                        <div className="flex items-center gap-1.5 text-sm font-bold text-[#2E86AB]">
+                          <Clock className="w-4 h-4" />
+                          {formatTime(appointment.startTime)}
+                        </div>
+                      </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                              <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                                <Clock className="text-blue-600 flex-shrink-0" size={18} />
-                                <div>
-                                  <span className="text-xs text-gray-500 block">Date</span>
-                                  <span className="text-sm font-medium text-gray-900">{formatDate(appointment.startTime)}</span>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                                <Clock className="text-blue-600 flex-shrink-0" size={18} />
-                                <div>
-                                  <span className="text-xs text-gray-500 block">Time</span>
-                                  <span className="text-sm font-medium text-gray-900">
-                                    {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
-                                  </span>
-                                </div>
-                              </div>
-                              {appointment.doctorId && (
-                                <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                                  <User className="text-blue-600 flex-shrink-0" size={18} />
-                                  <div>
-                                    <span className="text-xs text-gray-500 block">Doctor</span>
-                                    <span className="text-sm font-medium text-gray-900">
-                                      Dr. {appointment.doctorId.firstName} {appointment.doctorId.lastName}
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                              {appointment.type && (
-                                <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                                  <FileText className="text-blue-600 flex-shrink-0" size={18} />
-                                  <div>
-                                    <span className="text-xs text-gray-500 block">Type</span>
-                                    <span className="text-sm font-medium text-gray-900 capitalize">{appointment.type}</span>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-
-                            {appointment.notes && (
-                              <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
-                                <p className="text-sm text-gray-700">
-                                  <span className="font-semibold text-gray-900">Notes:</span> {appointment.notes}
-                                </p>
-                              </div>
-                            )}
+                      {/* Main Content Info */}
+                      <div className="flex-1 p-6 sm:p-8 relative">
+                        {/* Status Badge */}
+                        <div className="absolute top-6 right-6">
+                          <div className={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1.5 ${getStatusStyle(appointment.status)}`}>
+                            {getStatusIcon(appointment.status)}
+                            <span className="uppercase tracking-wider">{appointment.status.replace('-', ' ')}</span>
                           </div>
                         </div>
+
+                        <div className="pr-32 mb-6 text-left">
+                          <h3 className="text-xl font-bold text-[#212529] mb-2">{appointment.title}</h3>
+                          {appointment.description && (
+                            <p className="text-[#6C757D] text-sm leading-relaxed">{appointment.description}</p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          
+                          {/* Mobile Date/Time inline */}
+                          <div className="md:hidden flex items-start gap-3 p-3 rounded-xl bg-[#F8F9FA] border border-[#E9ECEF]">
+                             <Calendar className="w-5 h-5 text-[#2E86AB] mt-0.5" />
+                             <div>
+                               <p className="text-xs font-semibold text-[#868E96] uppercase tracking-wider mb-0.5">Date & Time</p>
+                               <p className="text-sm font-medium text-[#212529]">{formatDate(appointment.startTime)}</p>
+                               <p className="text-sm font-semibold text-[#2E86AB]">{formatTime(appointment.startTime)}</p>
+                             </div>
+                          </div>
+
+                          {appointment.doctorId && (
+                            <div className="flex items-start gap-3 p-3 rounded-xl bg-[#F8F9FA] border border-[#E9ECEF]">
+                              <div className="w-10 h-10 rounded-full bg-white border border-[#DEE2E6] overflow-hidden flex-shrink-0">
+                                <img src={`https://ui-avatars.com/api/?name=${appointment.doctorId.firstName}+${appointment.doctorId.lastName}&background=2E86AB&color=fff`} alt="Doctor" className="w-full h-full object-cover" />
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-[#868E96] uppercase tracking-wider mb-0.5">Physician</p>
+                                <p className="text-sm font-bold text-[#212529]">Dr. {appointment.doctorId.firstName} {appointment.doctorId.lastName}</p>
+                                <p className="text-xs text-[#6C757D]">Cardiology</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {appointment.type && (
+                            <div className="flex items-start gap-3 p-3 rounded-xl bg-[#F8F9FA] border border-[#E9ECEF]">
+                              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 border border-[#DEE2E6]">
+                                {appointment.type.toLowerCase().includes('video') || appointment.type.toLowerCase().includes('tele') 
+                                  ? <Video className="w-5 h-5 text-[#00A896]" /> 
+                                  : <MapPin className="w-5 h-5 text-[#2E86AB]" />}
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-[#868E96] uppercase tracking-wider mb-0.5">Location / Type</p>
+                                <p className="text-sm font-bold text-[#212529] capitalize">{appointment.type}</p>
+                                <p className="text-xs text-[#6C757D]">
+                                  {appointment.type.toLowerCase().includes('video') ? 'Link will be sent' : 'Main Clinic Building'}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {appointment.notes && (
+                          <div className="mt-6 p-4 bg-yellow-50/50 rounded-xl border border-yellow-200 border-l-4 border-l-yellow-400">
+                            <p className="text-sm text-[#856404]">
+                              <span className="font-semibold block mb-1">Important Instructions:</span> {appointment.notes}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {/* Actions for active appointments */}
+                        {(appointment.status === 'scheduled' || appointment.status === 'in-progress') && (
+                          <div className="mt-6 pt-6 border-t border-[#E9ECEF] flex flex-col sm:flex-row gap-3">
+                             <button className="flex-1 px-4 py-2 border border-[#DEE2E6] bg-white text-[#495057] font-medium rounded-xl hover:bg-[#F8F9FA] transition-colors focus:ring-4 focus:ring-[#E9ECEF]">
+                               Reschedule
+                             </button>
+                             <button className="flex-1 px-4 py-2 border border-red-200 bg-red-50 text-[#DC3545] font-medium rounded-xl hover:bg-red-100 transition-colors focus:ring-4 focus:ring-red-100">
+                               Cancel Appointment
+                             </button>
+                             {(appointment.type?.toLowerCase().includes('video') || appointment.type?.toLowerCase().includes('tele')) && (
+                               <button className="flex-1 px-4 py-2 bg-[#00A896] text-white font-medium rounded-xl hover:bg-[#028F7E] transition-colors flex items-center justify-center gap-2 focus:ring-4 focus:ring-[#00A896]/30">
+                                 <Video className="w-4 h-4" /> Join Call
+                               </button>
+                             )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

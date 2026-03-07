@@ -5,11 +5,11 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useChangePasswordMutation } from '../services/userApi';
-import { ArrowLeft, Lock } from 'lucide-react';
+import { ArrowLeft, Lock, ShieldCheck, KeyRound, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const changePasswordSchema = yup.object({
   currentPassword: yup.string().required('Current password is required'),
-  newPassword: yup.string().min(6, 'Password must be at least 6 characters').required('New password is required'),
+  newPassword: yup.string().min(8, 'Password must be at least 8 characters').required('New password is required'),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('newPassword')], 'Passwords must match')
@@ -40,7 +40,7 @@ export default function SettingsPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm({
     resolver: yupResolver(changePasswordSchema),
@@ -51,123 +51,187 @@ export default function SettingsPage() {
       setErrorMessage('');
       setSuccessMessage('');
       await changePassword(data).unwrap();
-      setSuccessMessage('Password changed successfully!');
+      setSuccessMessage('Security credentials updated successfully.');
       reset();
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setTimeout(() => setSuccessMessage(''), 4000);
     } catch (error) {
-      setErrorMessage(error.data?.message || 'Failed to change password');
+      setErrorMessage(error.data?.message || 'Failed to update security credentials.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F8F9FA] text-[#212529] font-['Inter'] pb-12">
+      
       {/* Header */}
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
+      <nav className="bg-white border-b border-[#E9ECEF] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 h-16">
-            <button
-              onClick={() => navigate(getDashboardUrl())}
-              className="p-2 hover:bg-gray-100 rounded-md transition-colors flex-shrink-0"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-900 truncate">Account Settings</h1>
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => navigate(getDashboardUrl())}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-[#6C757D] hover:bg-[#F8F9FA] hover:text-[#2E86AB] transition-colors"
+                aria-label="Go back to dashboard"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-xl font-bold text-[#212529] tracking-tight">Security Settings</h1>
+            </div>
+            
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-[#E0F4F1] rounded-full border border-[#00A896]/20">
+              <ShieldCheck className="w-4 h-4 text-[#00A896]" />
+              <span className="text-[10px] font-bold text-[#00A896] tracking-widest uppercase">Encrypted</span>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Main content */}
-      <main className="max-w-2xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      {/* Main Content */}
+      <main className="max-w-2xl mx-auto pt-10 px-4 sm:px-6 lg:px-8">
+        
         {successMessage && (
-          <div className="mb-4 rounded-md bg-green-50 p-4">
-            <p className="text-sm text-green-700">{successMessage}</p>
+          <div className="mb-6 rounded-xl bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+            <p className="text-emerald-800 text-sm font-medium">{successMessage}</p>
           </div>
         )}
 
         {errorMessage && (
-          <div className="mb-4 rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-700">{errorMessage}</p>
+          <div className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-red-800 text-sm font-medium">{errorMessage}</p>
           </div>
         )}
 
-        {/* Change Password Section */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Lock size={24} className="text-blue-600" />
-            <h2 className="text-xl font-semibold text-gray-900">Change Password</h2>
-          </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-[#E9ECEF] relative overflow-hidden">
+           {/* Decorative Top Accent */}
+           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#212529] to-[#495057]"></div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div>
-              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
-                Current Password
-              </label>
-              <input
-                id="currentPassword"
-                type="password"
-                {...register('currentPassword')}
-                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.currentPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.currentPassword.message}</p>
-              )}
-            </div>
+           <div className="p-6 sm:p-10">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-xl bg-[#F8F9FA] border border-[#DEE2E6] flex items-center justify-center shadow-sm">
+                   <KeyRound className="text-[#495057] w-6 h-6" />
+                </div>
+                <div>
+                   <h2 className="text-xl font-bold text-[#212529] tracking-tight mb-1">Update Password</h2>
+                   <p className="text-sm text-[#6C757D] font-medium">Manage your account authentication credentials</p>
+                </div>
+              </div>
 
-            <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-                New Password
-              </label>
-              <input
-                id="newPassword"
-                type="password"
-                {...register('newPassword')}
-                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.newPassword && <p className="mt-1 text-sm text-red-600">{errors.newPassword.message}</p>}
-            </div>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                
+                {/* Current Password */}
+                <div>
+                  <label htmlFor="currentPassword" className="block text-xs font-bold text-[#495057] uppercase tracking-wider mb-2">
+                    Current Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                       <Lock className="w-4 h-4 text-[#A0AEC0]" />
+                    </div>
+                    <input
+                      id="currentPassword"
+                      type="password"
+                      placeholder="Enter your current password"
+                      {...register('currentPassword')}
+                      className={`block w-full pl-11 pr-4 py-3 bg-[#F8F9FA] border ${errors.currentPassword ? 'border-[#DC3545] focus:ring-[#DC3545]/20 focus:border-[#DC3545]' : 'border-[#DEE2E6] focus:ring-[#212529]/20 focus:border-[#212529]'} rounded-xl focus:outline-none focus:ring-2 focus:bg-white text-[#212529] sm:text-sm transition-all duration-200`}
+                    />
+                  </div>
+                  {errors.currentPassword && (
+                    <p className="mt-2 text-xs text-[#DC3545] font-medium flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> {errors.currentPassword.message}
+                    </p>
+                  )}
+                </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm New Password
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                {...register('confirmPassword')}
-                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
-              )}
-            </div>
+                <hr className="border-[#E9ECEF] my-6" />
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="flex-1 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
-              >
-                {isLoading ? 'Updating...' : 'Change Password'}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate(getDashboardUrl())}
-                className="flex-1 px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                   {/* New Password */}
+                   <div>
+                     <label htmlFor="newPassword" className="block text-xs font-bold text-[#495057] uppercase tracking-wider mb-2">
+                       New Password
+                     </label>
+                     <input
+                       id="newPassword"
+                       type="password"
+                       placeholder="Min. 8 characters"
+                       {...register('newPassword')}
+                       className={`block w-full px-4 py-3 bg-[#F8F9FA] border ${errors.newPassword ? 'border-[#DC3545] focus:ring-[#DC3545]/20 focus:border-[#DC3545]' : 'border-[#DEE2E6] focus:ring-[#2E86AB]/20 focus:border-[#2E86AB]'} rounded-xl focus:outline-none focus:ring-2 focus:bg-white text-[#212529] sm:text-sm transition-all duration-200`}
+                     />
+                     {errors.newPassword && (
+                        <p className="mt-2 text-xs text-[#DC3545] font-medium flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" /> {errors.newPassword.message}
+                        </p>
+                     )}
+                   </div>
+
+                   {/* Confirm New Password */}
+                   <div>
+                     <label htmlFor="confirmPassword" className="block text-xs font-bold text-[#495057] uppercase tracking-wider mb-2">
+                       Confirm Password
+                     </label>
+                     <input
+                       id="confirmPassword"
+                       type="password"
+                       placeholder="Verify new password"
+                       {...register('confirmPassword')}
+                       className={`block w-full px-4 py-3 bg-[#F8F9FA] border ${errors.confirmPassword ? 'border-[#DC3545] focus:ring-[#DC3545]/20 focus:border-[#DC3545]' : 'border-[#DEE2E6] focus:ring-[#2E86AB]/20 focus:border-[#2E86AB]'} rounded-xl focus:outline-none focus:ring-2 focus:bg-white text-[#212529] sm:text-sm transition-all duration-200`}
+                     />
+                     {errors.confirmPassword && (
+                        <p className="mt-2 text-xs text-[#DC3545] font-medium flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" /> {errors.confirmPassword.message}
+                        </p>
+                     )}
+                   </div>
+                </div>
+
+                {/* Actions */}
+                <div className="pt-8 mt-2 flex flex-col sm:flex-row gap-4 justify-end border-t border-[#E9ECEF]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                        reset();
+                        navigate(getDashboardUrl());
+                    }}
+                    className="px-6 py-3 border border-[#DEE2E6] text-[#495057] bg-white rounded-xl hover:bg-[#F8F9FA] font-bold transition-all focus:ring-2 focus:ring-[#E9ECEF] focus:outline-none sm:order-1 order-2 text-sm"
+                  >
+                    Cancel Edit
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLoading || !isDirty}
+                    className="flex items-center justify-center gap-2 px-8 py-3 bg-[#212529] text-white rounded-xl hover:bg-[#343A40] disabled:bg-[#DEE2E6] disabled:text-[#ADB5BD] disabled:cursor-not-allowed font-bold transition-all shadow-sm focus:ring-2 focus:ring-[#212529]/50 focus:outline-none sm:order-2 order-1 text-sm"
+                  >
+                    {isLoading ? (
+                       <>
+                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                         <span>Updating...</span>
+                       </>
+                    ) : (
+                       <span>Update Credentials</span>
+                    )}
+                  </button>
+                </div>
+              </form>
+           </div>
         </div>
 
-        {/* Security Tips */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-900 mb-2">Security Tips:</h3>
-          <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-            <li>Use a strong password with at least 8 characters</li>
-            <li>Include uppercase letters, lowercase letters, numbers, and symbols</li>
-            <li>Don't share your password with anyone</li>
-            <li>Change your password periodically</li>
+        {/* Security Guidelines */}
+        <div className="mt-6 bg-[#E8F4F8] border border-[#2E86AB]/20 rounded-2xl p-6 relative overflow-hidden">
+          <ShieldCheck className="absolute right-[-20px] bottom-[-20px] w-40 h-40 text-[#2E86AB]/5 pointer-events-none" />
+          <h3 className="text-[#2E86AB] font-bold text-sm uppercase tracking-wider flex items-center gap-2 mb-3">
+            <Lock className="w-4 h-4" /> Password Guidelines
+          </h3>
+          <ul className="text-sm text-[#495057] font-medium space-y-2 relative z-10">
+            <li className="flex items-start gap-2">
+               <span className="text-[#2E86AB] font-black">•</span> Use a complex passphrase of at least 8 characters.
+            </li>
+            <li className="flex items-start gap-2">
+               <span className="text-[#2E86AB] font-black">•</span> Mix uppercase and lowercase letters, numbers, and symbols.
+            </li>
+            <li className="flex items-start gap-2">
+               <span className="text-[#2E86AB] font-black">•</span> Do not share your password across multiple clinical platforms.
+            </li>
           </ul>
         </div>
       </main>

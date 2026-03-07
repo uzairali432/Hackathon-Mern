@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lightbulb, AlertCircle, Search, FileText } from 'lucide-react';
+import { Lightbulb, AlertCircle, Search, FileText, Activity, BrainCircuit, HeartPulse, ShieldCheck, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 
 export default function AIAssistance({ patientId = null }) {
@@ -14,10 +14,10 @@ export default function AIAssistance({ patientId = null }) {
   const handleGetSuggestions = async (e) => {
     e.preventDefault();
     setError('');
-    setSuggestions(null);
+    // setSuggestions(null); // Keep previous to prevent jarring jump
 
     if (!symptoms.trim()) {
-      setError('Please enter symptoms');
+      setError('Please enter clear clinical symptoms for analysis.');
       return;
     }
 
@@ -47,222 +47,286 @@ export default function AIAssistance({ patientId = null }) {
 
       setSuggestions(response.data.data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to get AI suggestions');
+      setError(err.response?.data?.message || 'Failed to connect to MedConnect AI services.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200/50 p-6 space-y-6 hover:shadow-md transition-all duration-300">
-      <div className="flex items-start gap-4">
-        <div className="p-3 bg-gradient-to-br from-yellow-100 to-amber-50 rounded-xl">
-          <Lightbulb size={24} className="text-yellow-600" />
+    <div className="bg-white rounded-2xl border border-[#E9ECEF] p-6 sm:p-8 relative overflow-hidden shadow-sm">
+      {/* Decorative header accent */}
+      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#00A896] to-[#02C39A]"></div>
+
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 rounded-xl bg-[#E0F4F1] flex items-center justify-center border border-[#00A896]/20 shadow-sm relative overflow-hidden">
+           <div className="absolute inset-0 bg-[#00A896] opacity-10 animate-pulse"></div>
+           <BrainCircuit className="text-[#00A896] w-5 h-5 relative z-10" />
         </div>
-        <div className="flex-1">
-          <h3 className="text-xl font-bold text-gray-900 mb-1">Smart Symptom Checker</h3>
-          <p className="text-sm text-gray-600">
-            Enhanced AI-assisted diagnosis with patient history, risk levels, and suggested tests
+        <div>
+          <h3 className="text-xl font-bold text-[#212529] flex items-center gap-2">
+            MedConnect AI Diagnostic Assistant <span className="px-2 py-0.5 bg-[#00A896]/10 text-[#00A896] text-[10px] font-black uppercase tracking-widest rounded border border-[#00A896]/20">Pro</span>
+          </h3>
+          <p className="text-sm text-[#6C757D] font-medium">
+            Clinical decision support using advanced symptom-vector analysis
           </p>
         </div>
       </div>
 
-      {/* Input Form */}
-      <form onSubmit={handleGetSuggestions} className="space-y-4 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
-        {/* Symptoms */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Symptoms <span className="text-red-600">*</span>
-          </label>
-          <textarea
-            value={symptoms}
-            onChange={(e) => setSymptoms(e.target.value)}
-            placeholder="Enter symptoms separated by commas. E.g., fever, cough, sore throat"
-            rows="3"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <p className="text-xs text-gray-500 mt-1">Separate multiple symptoms with commas</p>
-        </div>
-
-        {/* Age and Gender */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Age (Optional)</label>
-            <input
-              type="number"
-              value={patientAge}
-              onChange={(e) => setPatientAge(e.target.value)}
-              placeholder="e.g., 45"
-              min="0"
-              max="150"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Gender (Optional)</label>
-            <select
-              value={patientGender}
-              onChange={(e) => setPatientGender(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Patient ID (Optional - for history) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Patient ID (Optional - for history analysis)</label>
-          <input
-            type="text"
-            value={patientIdInput}
-            onChange={(e) => setPatientIdInput(e.target.value)}
-            placeholder="Enter patient ID to include medical history"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <p className="text-xs text-gray-500 mt-1">Include patient history for better AI analysis</p>
-        </div>
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none"
-        >
-          {loading ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-              <span>Analyzing...</span>
-            </>
-          ) : (
-            <>
-              <Search size={18} />
-              <span>Get AI Suggestions</span>
-            </>
-          )}
-        </button>
-      </form>
-
-      {/* Error Message */}
-      {error && (
-        <div className="flex gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
-          <p>{error}</p>
-        </div>
-      )}
-
-      {/* Disclaimer */}
-      {suggestions && (
-        <div className="flex gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm">
-          <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
-          <p>{suggestions.disclaimer}</p>
-        </div>
-      )}
-
-      {/* Warnings */}
-      {suggestions?.warnings && suggestions.warnings.length > 0 && (
-        <div className="space-y-2">
-          {suggestions.warnings.map((warning, idx) => (
-            <div key={idx} className="flex gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
-              <p>{warning}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Risk Level */}
-      {suggestions?.riskLevel && (
-        <div className={`p-5 rounded-xl border-2 shadow-sm animate-fade-in-up ${
-          suggestions.riskLevel === 'Critical' ? 'bg-gradient-to-r from-red-50 to-pink-50 border-red-300' :
-          suggestions.riskLevel === 'High' ? 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-300' :
-          suggestions.riskLevel === 'Medium' ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300' :
-          'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300'
-        }`}>
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${
-              suggestions.riskLevel === 'Critical' ? 'bg-red-100' :
-              suggestions.riskLevel === 'High' ? 'bg-orange-100' :
-              suggestions.riskLevel === 'Medium' ? 'bg-yellow-100' :
-              'bg-green-100'
-            }`}>
-              <AlertCircle size={24} className={
-                suggestions.riskLevel === 'Critical' ? 'text-red-600' :
-                suggestions.riskLevel === 'High' ? 'text-orange-600' :
-                suggestions.riskLevel === 'Medium' ? 'text-yellow-600' :
-                'text-green-600'
-              } />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Risk Assessment</p>
-              <h4 className="text-xl font-bold text-gray-900 capitalize">{suggestions.riskLevel}</h4>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Suggested Tests */}
-      {suggestions?.suggestedTests && suggestions.suggestedTests.length > 0 && (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 shadow-sm">
-          <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <FileText size={18} className="text-blue-600" />
-            Suggested Diagnostic Tests
-          </h4>
-          <ul className="space-y-2">
-            {suggestions.suggestedTests.map((test, idx) => (
-              <li key={idx} className="flex items-start gap-3 p-2 bg-white rounded-lg">
-                <span className="text-blue-600 font-bold mt-0.5">•</span>
-                <span className="text-sm text-gray-700 font-medium">{test}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Suggestions */}
-      {suggestions?.suggestions && suggestions.suggestions.length > 0 && (
-        <div className="space-y-4">
-          <h4 className="font-semibold text-gray-900">Possible Diagnoses:</h4>
-          {suggestions.suggestions.map((suggestion, idx) => (
-            <div key={idx} className="border rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h5 className="font-semibold text-gray-900">{suggestion.condition}</h5>
-                  <p className="text-sm text-gray-600">{suggestion.icdCode && `(ICD Code: ${suggestion.icdCode})`}</p>
-                </div>
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                  {suggestion.confidence}
-                </span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+         <div className="lg:col-span-5 space-y-6">
+            {/* Input Form */}
+            <form onSubmit={handleGetSuggestions} className="bg-[#F8F9FA] p-6 rounded-2xl border border-[#DEE2E6] space-y-5">
+              
+              <div className="flex items-center justify-between mb-2">
+                 <h4 className="font-bold text-[#495057] uppercase tracking-wide text-sm flex items-center gap-1.5">
+                    <Activity className="w-4 h-4 text-[#2E86AB]" /> Clinical Input Array
+                 </h4>
               </div>
 
-              {/* Recommendations */}
+              {/* Symptoms */}
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Recommendations:</p>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  {suggestion.recommendations.map((rec, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-blue-600 font-bold">•</span>
-                      <span>{rec}</span>
-                    </li>
-                  ))}
-                </ul>
+                <label className="block text-xs font-bold text-[#495057] uppercase tracking-wider mb-2">
+                  Presenting Symptoms <span className="text-[#DC3545] text-lg leading-none">*</span>
+                </label>
+                <textarea
+                  value={symptoms}
+                  onChange={(e) => setSymptoms(e.target.value)}
+                  placeholder="e.g. persistent cough, fever (39C), dyspnea, fatigue"
+                  rows="3"
+                  className="w-full px-4 py-3 border border-[#CED4DA] rounded-xl text-[#212529] focus:outline-none focus:ring-2 focus:ring-[#00A896]/20 focus:border-[#00A896] transition-colors resize-y placeholder:text-[#A0AEC0] shadow-sm bg-white"
+                />
+                <p className="text-[10px] uppercase font-bold text-[#6C757D] mt-1.5 tracking-wide">Separate symptom descriptors with commas</p>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
 
-      {/* Empty State */}
-      {!suggestions && !loading && (
-        <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <Lightbulb size={32} className="mx-auto text-gray-400 mb-2" />
-          <p className="text-gray-600">Enter symptoms to get AI-assisted diagnosis suggestions</p>
-        </div>
-      )}
+              {/* Age and Gender */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#495057] uppercase tracking-wider mb-2">Age <span className="text-[#A0AEC0] font-normal lowercase tracking-normal">(Opt)</span></label>
+                  <input
+                    type="number"
+                    value={patientAge}
+                    onChange={(e) => setPatientAge(e.target.value)}
+                    placeholder="e.g. 45"
+                    min="0"
+                    max="150"
+                    className="w-full px-4 py-2.5 border border-[#CED4DA] rounded-xl text-[#212529] bg-white focus:outline-none focus:ring-2 focus:ring-[#00A896]/20 focus:border-[#00A896] transition-colors shadow-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#495057] uppercase tracking-wider mb-2">Sex <span className="text-[#A0AEC0] font-normal lowercase tracking-normal">(Opt)</span></label>
+                  <div className="relative">
+                     <select
+                       value={patientGender}
+                       onChange={(e) => setPatientGender(e.target.value)}
+                       className="w-full px-4 py-2.5 border border-[#CED4DA] rounded-xl text-[#212529] bg-white focus:outline-none focus:ring-2 focus:ring-[#00A896]/20 focus:border-[#00A896] transition-colors shadow-sm appearance-none cursor-pointer"
+                     >
+                       <option value="">Select</option>
+                       <option value="male">Male</option>
+                       <option value="female">Female</option>
+                       <option value="other">Other</option>
+                     </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Patient ID */}
+              <div>
+                <label className="block text-xs font-bold text-[#495057] uppercase tracking-wider mb-2">Contextual Record ID <span className="text-[#A0AEC0] font-normal lowercase tracking-normal">(Opt)</span></label>
+                <input
+                  type="text"
+                  value={patientIdInput}
+                  onChange={(e) => setPatientIdInput(e.target.value)}
+                  placeholder="Paste ID for historical context correlation"
+                  className="w-full px-4 py-2.5 border border-[#CED4DA] rounded-xl text-[#212529] bg-white focus:outline-none focus:ring-2 focus:ring-[#00A896]/20 focus:border-[#00A896] transition-colors font-mono text-sm shadow-sm"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-4 bg-gradient-to-r from-[#00A896] to-[#02C39A] text-white py-3 rounded-xl font-bold shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-[3px] border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span className="tracking-wide">Computing Vectors...</span>
+                  </>
+                ) : (
+                  <>
+                    <BrainCircuit size={18} className="group-hover:scale-110 transition-transform" />
+                    <span className="tracking-wide">Execute Clinical Analysis</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Error Message */}
+            {error && (
+              <div className="flex gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm animate-in fade-in slide-in-from-top-2">
+                <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
+                <p className="font-medium">{error}</p>
+              </div>
+            )}
+         </div>
+
+         <div className="lg:col-span-7">
+            {/* Empty State */}
+            {!suggestions && !loading && (
+              <div className="h-full min-h-[400px] border-2 border-dashed border-[#DEE2E6] rounded-2xl flex flex-col items-center justify-center p-8 text-center bg-[#F8F9FA]/50">
+                <div className="w-20 h-20 bg-white rounded-full shadow-sm flex items-center justify-center mb-6">
+                   <BrainCircuit size={40} className="text-[#DEE2E6]" />
+                </div>
+                <h4 className="text-[#495057] font-bold text-lg mb-2">Awaiting Clinical Input</h4>
+                <p className="text-[#6C757D] text-sm max-w-sm leading-relaxed">
+                  Enter presenting symptoms and relevant patient demographics in the input array to generate AI-assisted diagnostic insights, risk assessments, and recommended investigative pathways.
+                </p>
+              </div>
+            )}
+
+            {loading && !suggestions && (
+              <div className="h-full min-h-[400px] border border-[#DEE2E6] rounded-2xl flex flex-col items-center justify-center p-8 text-center bg-[#F8F9FA]/50">
+                 <div className="w-20 h-20 relative flex items-center justify-center mb-6">
+                    <div className="absolute inset-0 border-4 border-[#00A896]/20 rounded-full animate-ping"></div>
+                    <div className="absolute inset-2 border-4 border-[#00A896]/40 rounded-full animate-pulse"></div>
+                    <BrainCircuit size={32} className="text-[#00A896] animate-pulse relative z-10" />
+                 </div>
+                 <h4 className="text-[#00A896] font-bold text-lg mb-2">Analyzing Clinical Vectors</h4>
+                 <p className="text-[#6C757D] text-sm animate-pulse">Correlating symptoms against medical databases...</p>
+              </div>
+            )}
+
+            {/* Results */}
+            {suggestions && (
+               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  
+                  {/* Analysis Header & Risk */}
+                  <div className="flex flex-col sm:flex-row gap-4 items-stretch">
+                     {suggestions?.riskLevel && (
+                       <div className={`flex-1 p-5 rounded-2xl border ${
+                         suggestions.riskLevel === 'Critical' ? 'bg-red-50 border-red-200' :
+                         suggestions.riskLevel === 'High' ? 'bg-orange-50 border-orange-200' :
+                         suggestions.riskLevel === 'Medium' ? 'bg-amber-50 border-amber-200' :
+                         'bg-emerald-50 border-emerald-200'
+                       }`}>
+                         <div className="flex items-center gap-4">
+                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                             suggestions.riskLevel === 'Critical' ? 'bg-red-100 text-red-600' :
+                             suggestions.riskLevel === 'High' ? 'bg-orange-100 text-orange-600' :
+                             suggestions.riskLevel === 'Medium' ? 'bg-amber-100 text-amber-600' :
+                             'bg-emerald-100 text-emerald-600'
+                           }`}>
+                             <HeartPulse size={24} />
+                           </div>
+                           <div>
+                             <p className="text-[10px] font-bold text-[#6C757D] uppercase tracking-widest mb-0.5">Assessed Risk Tier</p>
+                             <h4 className={`text-2xl font-black uppercase tracking-tight ${
+                               suggestions.riskLevel === 'Critical' ? 'text-red-700' :
+                               suggestions.riskLevel === 'High' ? 'text-orange-700' :
+                               suggestions.riskLevel === 'Medium' ? 'text-amber-700' :
+                               'text-emerald-700'
+                             }`}>{suggestions.riskLevel}</h4>
+                           </div>
+                         </div>
+                       </div>
+                     )}
+
+                     <div className="flex-1 bg-[#212529] rounded-2xl p-5 border border-[#343A40] relative overflow-hidden flex flex-col justify-center">
+                        <ShieldCheck className="absolute right-[-10px] bottom-[-10px] w-24 h-24 text-white/5 pointer-events-none" />
+                        <h4 className="text-white font-bold text-sm mb-1.5 flex items-center gap-2">
+                           <Lightbulb className="w-4 h-4 text-emerald-400" />
+                           Clinical Support Tool
+                        </h4>
+                        <p className="text-[#ADB5BD] text-xs leading-relaxed">
+                          This AI analysis is designed to augment, not replace, professional clinical judgment. Verify all findings independently.
+                        </p>
+                     </div>
+                  </div>
+
+                  {/* Warnings */}
+                  {suggestions?.warnings && suggestions.warnings.length > 0 && (
+                     <div className="space-y-3">
+                       {suggestions.warnings.map((warning, idx) => (
+                         <div key={idx} className="flex gap-3 p-4 bg-red-50 border-l-4 border-l-red-500 border-y border-r border-[#E9ECEF] rounded-r-xl text-red-800 text-sm shadow-sm">
+                           <AlertCircle size={18} className="flex-shrink-0 mt-0.5 text-red-600" />
+                           <p className="font-bold">{warning}</p>
+                         </div>
+                       ))}
+                     </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     {/* Suggested Tests */}
+                     {suggestions?.suggestedTests && suggestions.suggestedTests.length > 0 && (
+                       <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 shadow-sm">
+                         <h4 className="font-black text-[#212529] mb-4 flex items-center gap-2 uppercase tracking-wide text-sm border-b border-[#E9ECEF] pb-3">
+                           <FileText size={16} className="text-[#2E86AB]" /> Recommended Screenings
+                         </h4>
+                         <ul className="space-y-2.5">
+                           {suggestions.suggestedTests.map((test, idx) => (
+                             <li key={idx} className="flex items-start gap-3 bg-[#F8F9FA] p-3 rounded-xl border border-[#E9ECEF] group hover:border-[#2E86AB]/30 transition-colors">
+                               <div className="w-5 h-5 rounded bg-[#E8F4F8] flex items-center justify-center flex-shrink-0 mt-0.5">
+                                 <span className="text-[#2E86AB] font-bold text-[10px]">{idx + 1}</span>
+                               </div>
+                               <span className="text-sm text-[#495057] font-semibold">{test}</span>
+                             </li>
+                           ))}
+                         </ul>
+                       </div>
+                     )}
+
+                     {/* Suggestions List */}
+                     {suggestions?.suggestions && suggestions.suggestions.length > 0 && (
+                       <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 shadow-sm">
+                         <h4 className="font-black text-[#212529] mb-4 flex items-center gap-2 uppercase tracking-wide text-sm border-b border-[#E9ECEF] pb-3">
+                           <BrainCircuit size={16} className="text-[#A23B72]" /> Differential Diagnoses
+                         </h4>
+                         <div className="space-y-4">
+                           {suggestions.suggestions.map((suggestion, idx) => (
+                             <div key={idx} className="bg-white border border-[#E9ECEF] rounded-xl p-4 hover:border-[#A23B72]/30 hover:shadow-sm transition-all relative overflow-hidden">
+                               <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#A23B72]/20"></div>
+                               
+                               <div className="flex items-start justify-between mb-3">
+                                 <div>
+                                   <h5 className="font-bold text-[#212529] text-base leading-tight mb-0.5">{suggestion.condition}</h5>
+                                   {suggestion.icdCode && (
+                                     <span className="inline-block px-1.5 py-0.5 bg-[#F8F9FA] border border-[#DEE2E6] text-[#6C757D] text-[10px] font-mono font-bold rounded">
+                                       ICD-10: {suggestion.icdCode}
+                                     </span>
+                                   )}
+                                 </div>
+                                 <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-black tracking-wide border border-emerald-100">
+                                   {Math.round(parseFloat(suggestion.confidence || "0") * 100) || suggestion.confidence}% Match
+                                 </span>
+                               </div>
+
+                               {/* Recommendations */}
+                               {suggestion.recommendations && suggestion.recommendations.length > 0 && (
+                                 <div className="bg-[#F8F9FA] rounded-lg p-3 border border-[#E9ECEF] mt-3">
+                                   <p className="text-[10px] font-black text-[#495057] uppercase tracking-wider mb-2">Clinical Next Steps</p>
+                                   <ul className="space-y-1.5">
+                                     {suggestion.recommendations.map((rec, i) => (
+                                       <li key={i} className="flex items-start gap-2 text-xs text-[#495057] font-medium leading-relaxed">
+                                         <ChevronRight size={14} className="text-[#A23B72] flex-shrink-0 mt-[1px]" />
+                                         <span>{rec}</span>
+                                       </li>
+                                     ))}
+                                   </ul>
+                                 </div>
+                               )}
+                             </div>
+                           ))}
+                         </div>
+                       </div>
+                     )}
+                  </div>
+
+               </div>
+            )}
+         </div>
+      </div>
     </div>
   );
 }
