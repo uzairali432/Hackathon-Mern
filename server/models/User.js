@@ -52,6 +52,11 @@ const userSchema = new mongoose.Schema(
       status: { type: String, enum: ['active', 'inactive', 'past_due'], default: 'inactive' },
       expiresAt: { type: Date, default: null },
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
     isActive: {
       type: Boolean,
       default: true,

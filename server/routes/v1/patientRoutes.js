@@ -2,6 +2,7 @@ import express from 'express';
 import * as patientController from '../../controllers/patientController.js';
 import { authenticate } from '../../middleware/authenticate.js';
 import { authorize } from '../../middleware/authorize.js';
+import { requireFeature } from '../../middleware/featureAccess.js';
 
 const router = express.Router();
 
@@ -24,7 +25,11 @@ router.get('/prescriptions/:id', patientController.getPrescriptionById);
 router.get('/prescriptions/:id/pdf', patientController.downloadPrescriptionPDF);
 
 // Get AI explanation for prescription
-router.get('/prescriptions/:id/explanation', patientController.getPrescriptionExplanation);
+router.get(
+	'/prescriptions/:id/explanation',
+	requireFeature('aiFeatures'),
+	patientController.getPrescriptionExplanation
+);
 
 export default router;
 

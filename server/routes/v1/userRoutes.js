@@ -2,6 +2,7 @@ import express from 'express';
 import * as userController from '../../controllers/userController.js';
 import { authenticate } from '../../middleware/authenticate.js';
 import { authorize } from '../../middleware/authorize.js';
+import { requireFeature } from '../../middleware/featureAccess.js';
 
 const router = express.Router();
 
@@ -26,7 +27,7 @@ router.delete('/:id', authenticate, authorize('admin'), userController.deleteUse
 // Admin - get users by role
 router.get('/role/:role', authenticate, authorize('admin'), userController.getUsersByRole);
 // Admin - analytics (simulated)
-router.get('/analytics', authenticate, authorize('admin'), userController.getAnalytics);
+router.get('/analytics', authenticate, authorize('admin'), requireFeature('advancedAnalytics'), userController.getAnalytics);
 // Admin - system usage and health
 router.get('/system/usage', authenticate, authorize('admin'), userController.getSystemUsage);
 router.get('/system/health', authenticate, authorize('admin'), userController.getSystemHealth);

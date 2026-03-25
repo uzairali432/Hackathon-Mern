@@ -2,6 +2,7 @@ import express from 'express';
 import * as doctorController from '../../controllers/doctorController.js';
 import { authenticate } from '../../middleware/authenticate.js';
 import { authorize } from '../../middleware/authorize.js';
+import { requireFeature } from '../../middleware/featureAccess.js';
 
 const router = express.Router();
 
@@ -16,14 +17,26 @@ router.patch('/appointments/:appointmentId/status', authenticate, authorize('doc
 // Patient management
 router.get('/patient/:patientId/history', authenticate, authorize('doctor'), doctorController.getPatientHistory);
 router.get('/patient/:patientId/prescriptions', authenticate, authorize('doctor'), doctorController.getPatientPrescriptions);
-router.get('/patient/:patientId/risk-flags', authenticate, authorize('doctor'), doctorController.getPatientRiskFlags);
+router.get(
+	'/patient/:patientId/risk-flags',
+	authenticate,
+	authorize('doctor'),
+	requireFeature('aiFeatures'),
+	doctorController.getPatientRiskFlags
+);
 
 // Diagnosis & Prescriptions
 router.post('/diagnosis', authenticate, authorize('doctor'), doctorController.addDiagnosis);
 router.post('/prescription', authenticate, authorize('doctor'), doctorController.writePrescription);
 
 // AI Assistance
-router.post('/ai-assistance', authenticate, authorize('doctor'), doctorController.getAIAssistance);
+router.post(
+	'/ai-assistance',
+	authenticate,
+	authorize('doctor'),
+	requireFeature('aiFeatures'),
+	doctorController.getAIAssistance
+);
 
 // Statistics
 router.get('/stats', authenticate, authorize('doctor'), doctorController.getDoctorStats);

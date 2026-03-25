@@ -1,16 +1,39 @@
 import User from '../models/User.js';
 import Appointment from '../models/Appointment.js';
 import { ApiError } from '../utils/ApiError.js';
+import { getUserPlanConfig, normalizePlan } from '../config/subscriptionPlans.js';
 
 export class ReceptionistService {
   // Register a new patient
-  static async registerPatient(patientData) {
+  static async registerPatient(patientData, currentUser) {
     const { firstName, lastName, email, password, phone, dob } = patientData;
+
+    if (!currentUser?._id) {
+      throw new ApiError('Authenticated user context is required', 401);
+    }
 
     // Basic checks
     const exists = await User.findOne({ email });
     if (exists) {
       throw new ApiError('Email already registered', 400);
+    }
+
+    const planConfig = getUserPlanConfig(currentUser);
+    const maxPatients = planConfig.limits?.maxPatients;
+
+    if (Number.isFinite(maxPatients)) {
+      const managedPatientsCount = await User.countDocuments({
+        role: 'patient',
+        createdBy: currentUser._id,
+      });
+
+      if (managedPatientsCount >= maxPatients) {
+        throw new ApiError(
+          `Patient limit reached for '${normalizePlan(currentUser.subscription?.plan)}' plan. ` +
+            `Upgrade to Pro for unlimited patients.`,
+          403
+        );
+      }
     }
 
     const user = new User({
@@ -21,6 +44,7 @@ export class ReceptionistService {
       phone,
       dob,
       role: 'patient',
+      createdBy: currentUser._id,
     });
 
     await user.save();

@@ -5,7 +5,7 @@ import { ReceptionistService } from '../services/receptionistService.js';
 
 export const registerPatient = asyncHandler(async (req, res) => {
   const patientData = req.body;
-  const user = await ReceptionistService.registerPatient(patientData);
+  const user = await ReceptionistService.registerPatient(patientData, req.user);
   res.status(201).json(new ApiResponse(201, user, 'Patient registered successfully'));
 });
 
