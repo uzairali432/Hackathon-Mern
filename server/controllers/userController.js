@@ -83,6 +83,18 @@ export const updateSubscription = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Checkout subscription for authenticated user
+ * POST /api/v1/users/subscription/checkout
+ */
+export const checkoutSubscription = asyncHandler(async (req, res) => {
+  const { plan } = req.body;
+
+  const user = await UserService.checkoutSubscription(req.user._id, { plan });
+
+  res.status(200).json(new ApiResponse(200, user, 'Subscription checkout completed successfully'));
+});
+
+/**
  * Update user profile
  * PUT /api/v1/users/profile
  */

@@ -103,6 +103,35 @@ export class UserService {
   }
 
   /**
+   * Checkout subscription for currently authenticated user
+   * @param {string} userId
+   * @param {Object} data
+   */
+  static async checkoutSubscription(userId, data) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError('User not found', 404);
+    }
+
+    const allowedPlans = ['basic', 'pro'];
+    if (!data?.plan || !allowedPlans.includes(data.plan)) {
+      throw new ApiError('Invalid plan. Allowed plans are: basic, pro', 400);
+    }
+
+    const durationDays = data.plan === 'pro' ? 30 : 30;
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + durationDays);
+
+    user.subscription = user.subscription || {};
+    user.subscription.plan = data.plan;
+    user.subscription.status = 'active';
+    user.subscription.expiresAt = expiresAt;
+
+    await user.save();
+    return user;
+  }
+
+  /**
    * Update user profile
    * @param {string} userId - User ID
    * @param {Object} updateData - Data to update
