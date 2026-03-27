@@ -34,13 +34,18 @@ const formatDate = (value) => {
 export default function SubscriptionPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user, loading: isAuthLoading } = useSelector((state) => state.auth);
   const [selectedPlan, setSelectedPlan] = useState('pro');
   const [checkoutSubscription, { isLoading }] = useCheckoutSubscriptionMutation();
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [optimisticSubscription, setOptimisticSubscription] = useState(null);
 
-  const currentPlan = useMemo(() => String(user?.subscription?.plan || 'free').toLowerCase(), [user]);
+  const effectiveSubscription = optimisticSubscription || user?.subscription;
+  const currentPlan = useMemo(() => String(effectiveSubscription?.plan || 'free').toLowerCase(), [effectiveSubscription]);
+  const currentStatus = useMemo(() => String(effectiveSubscription?.status || 'inactive').toLowerCase(), [effectiveSubscription]);
+  const isCurrentSelectionActive = selectedPlan === currentPlan && currentStatus === 'active';
+  const showSkeletons = isAuthLoading || !user;
 
   const getDashboardUrl = () => {
     switch (user?.role) {
@@ -56,9 +61,19 @@ export default function SubscriptionPage() {
   };
 
   const handleCheckout = async () => {
+    if (isCurrentSelectionActive || isLoading) {
+      return;
+    }
+
     try {
       setErrorMessage('');
-      setSuccessMessage('');
+      setSuccessMessage(`Updating to ${selectedPlan.toUpperCase()}...`);
+      setOptimisticSubscription({
+        ...(user?.subscription || {}),
+        plan: selectedPlan,
+        status: 'active',
+      });
+
       const response = await checkoutSubscription({ plan: selectedPlan }).unwrap();
       const updatedUser = response?.data;
 
@@ -66,8 +81,11 @@ export default function SubscriptionPage() {
         dispatch(setUser(updatedUser));
       }
 
+      setOptimisticSubscription(null);
       setSuccessMessage(`Subscription upgraded to ${selectedPlan.toUpperCase()} successfully.`);
     } catch (error) {
+      setOptimisticSubscription(null);
+      setSuccessMessage('');
       setErrorMessage(error?.data?.message || 'Subscription checkout failed. Please try again.');
     }
   };
@@ -128,64 +146,97 @@ export default function SubscriptionPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {PLANS.map((plan) => {
-                  const isActiveChoice = selectedPlan === plan.key;
-                  const isCurrent = currentPlan === plan.key;
+                {showSkeletons ? (
+                  Array.from({ length: 2 }).map((_, idx) => (
+                    <div key={`plan-skeleton-${idx}`} className="rounded-2xl border border-[#E5E7EB] p-5 animate-pulse">
+                      <div className="w-11 h-11 rounded-xl bg-[#E5E7EB] mb-4" />
+                      <div className="h-5 w-2/3 bg-[#E5E7EB] rounded mb-3" />
+                      <div className="h-6 w-1/2 bg-[#DBEAFE] rounded mb-3" />
+                      <div className="h-4 w-full bg-[#E5E7EB] rounded mb-2" />
+                      <div className="h-4 w-5/6 bg-[#E5E7EB] rounded mb-4" />
+                      <div className="space-y-2">
+                        <div className="h-4 w-full bg-[#E5E7EB] rounded" />
+                        <div className="h-4 w-4/5 bg-[#E5E7EB] rounded" />
+                        <div className="h-4 w-3/5 bg-[#E5E7EB] rounded" />
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  PLANS.map((plan) => {
+                    const isActiveChoice = selectedPlan === plan.key;
+                    const isCurrent = currentPlan === plan.key;
 
-                  return (
-                    <button
-                      key={plan.key}
-                      type="button"
-                      onClick={() => setSelectedPlan(plan.key)}
-                      className={`text-left rounded-2xl border p-5 transition-all ${
-                        isActiveChoice
-                          ? 'border-[#2563EB] shadow-[0_6px_20px_rgba(37,99,235,0.18)] bg-[#F8FAFC]'
-                          : 'border-[#E5E7EB] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]'
-                      }`}
-                    >
-                      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${plan.accent} text-white flex items-center justify-center mb-4`}>
-                        <CreditCard className="w-5 h-5" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-bold text-[#111827]">{plan.name}</h3>
-                        {isCurrent && (
-                          <span className="text-[11px] font-bold uppercase tracking-wide text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-full">
-                            Current
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[#2563EB] font-extrabold text-xl mt-1">{plan.price}</p>
-                      <p className="text-sm text-[#6B7280] mt-2">{plan.description}</p>
-                      <ul className="mt-4 space-y-2">
-                        {plan.features.map((feature) => (
-                          <li key={feature} className="text-sm text-[#374151] flex items-start gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={plan.key}
+                        type="button"
+                        onClick={() => setSelectedPlan(plan.key)}
+                        className={`text-left rounded-2xl border p-5 transition-all ${
+                          isActiveChoice
+                            ? 'border-[#2563EB] shadow-[0_6px_20px_rgba(37,99,235,0.18)] bg-[#F8FAFC]'
+                            : 'border-[#E5E7EB] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]'
+                        }`}
+                      >
+                        <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${plan.accent} text-white flex items-center justify-center mb-4`}>
+                          <CreditCard className="w-5 h-5" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-bold text-[#111827]">{plan.name}</h3>
+                          {isCurrent && (
+                            <span className="text-[11px] font-bold uppercase tracking-wide text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-full">
+                              Current
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[#2563EB] font-extrabold text-xl mt-1">{plan.price}</p>
+                        <p className="text-sm text-[#6B7280] mt-2">{plan.description}</p>
+                        <ul className="mt-4 space-y-2">
+                          {plan.features.map((feature) => (
+                            <li key={feature} className="text-sm text-[#374151] flex items-start gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </button>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>
 
           <aside className="space-y-6">
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">Current Subscription</p>
-              <p className="mt-2 text-2xl font-black text-[#111827] capitalize">{currentPlan}</p>
-              <p className="mt-1 text-sm text-[#6B7280] capitalize">Status: {user?.subscription?.status || 'inactive'}</p>
-              <p className="mt-1 text-sm text-[#6B7280]">Expires: {formatDate(user?.subscription?.expiresAt)}</p>
+              {showSkeletons ? (
+                <div className="animate-pulse">
+                  <div className="h-3 w-1/3 bg-[#E5E7EB] rounded" />
+                  <div className="h-8 w-1/2 bg-[#E5E7EB] rounded mt-3" />
+                  <div className="h-4 w-2/3 bg-[#E5E7EB] rounded mt-3" />
+                  <div className="h-4 w-2/3 bg-[#E5E7EB] rounded mt-2" />
+                  <div className="h-11 w-full bg-[#E5E7EB] rounded-xl mt-6" />
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">Current Subscription</p>
+                  <p className="mt-2 text-2xl font-black text-[#111827] capitalize">{currentPlan}</p>
+                  <p className="mt-1 text-sm text-[#6B7280] capitalize">Status: {currentStatus}</p>
+                  <p className="mt-1 text-sm text-[#6B7280]">Expires: {formatDate(effectiveSubscription?.expiresAt)}</p>
 
-              <button
-                type="button"
-                onClick={handleCheckout}
-                disabled={isLoading}
-                className="mt-6 w-full py-3 px-4 bg-[#111827] text-white font-semibold rounded-xl hover:bg-[#1F2937] disabled:bg-[#D1D5DB] disabled:text-[#6B7280] disabled:cursor-not-allowed transition-all"
-              >
-                {isLoading ? 'Processing...' : `Checkout ${selectedPlan.toUpperCase()}`}
-              </button>
+                  <button
+                    type="button"
+                    onClick={handleCheckout}
+                    disabled={isLoading || isCurrentSelectionActive}
+                    className="mt-6 w-full py-3 px-4 bg-[#111827] text-white font-semibold rounded-xl hover:bg-[#1F2937] disabled:bg-[#D1D5DB] disabled:text-[#6B7280] disabled:cursor-not-allowed transition-all"
+                  >
+                    {isLoading
+                      ? 'Processing...'
+                      : isCurrentSelectionActive
+                      ? `${selectedPlan.toUpperCase()} is your active plan`
+                      : `Checkout ${selectedPlan.toUpperCase()}`}
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="bg-[#ECFDF3] border border-[#BBF7D0] rounded-2xl p-5">

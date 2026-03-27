@@ -2,7 +2,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useLogoutMutation } from '../services/authApi';
 import { logout as logoutAction } from '../store/slices/authSlice';
-import { LogOut, Settings, User, Calendar, Pill, Brain, BarChart3, FileText, CheckCircle, ShieldCheck, Stethoscope } from 'lucide-react';
+import { LogOut, Settings, User, Calendar, Pill, Brain, BarChart3, FileText, CheckCircle, ShieldCheck, Stethoscope, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 import AppointmentsList from '../components/doctor/AppointmentsList';
 import PatientHistory from '../components/doctor/PatientHistory';
@@ -86,6 +86,13 @@ export default function DoctorDashboard() {
                 >
                   <Settings size={16} />
                   <span className="hidden sm:inline">Settings</span>
+                </button>
+                <button
+                  onClick={() => navigate('/subscription')}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold text-[#495057] hover:bg-[#F8F9FA] border border-transparent hover:border-[#DEE2E6] transition-all"
+                >
+                  <CreditCard size={16} />
+                  <span className="hidden sm:inline">Plan</span>
                 </button>
                 <button
                   onClick={handleLogout}

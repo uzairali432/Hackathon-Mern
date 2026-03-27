@@ -18,7 +18,8 @@ import {
   Stethoscope,
   PhoneCall,
   ShieldCheck,
-  Star
+  Star,
+  CreditCard
 } from 'lucide-react';
 
 export default function PatientDashboard() {
@@ -128,6 +129,10 @@ export default function PatientDashboard() {
             <button onClick={() => handleNavigate('/settings')} className="w-full text-left text-[#6C757D] hover:bg-[#F8F9FA] hover:text-[#2E86AB] group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors">
               <Settings className="mr-3 flex-shrink-0 h-5 w-5 text-[#A0AEC0] group-hover:text-[#2E86AB] transition-colors" />
               Settings
+            </button>
+            <button onClick={() => handleNavigate('/subscription')} className="w-full text-left text-[#6C757D] hover:bg-[#F8F9FA] hover:text-[#2E86AB] group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors">
+              <CreditCard className="mr-3 flex-shrink-0 h-5 w-5 text-[#A0AEC0] group-hover:text-[#2E86AB] transition-colors" />
+              Subscription
             </button>
           </nav>
           

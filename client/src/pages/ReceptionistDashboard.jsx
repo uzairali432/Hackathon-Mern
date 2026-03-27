@@ -2,7 +2,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useLogoutMutation } from '../services/authApi';
 import { logout as logoutAction } from '../store/slices/authSlice';
-import { LogOut, Settings, User, Calendar, Users } from 'lucide-react';
+import { LogOut, Settings, User, Calendar, Users, CreditCard } from 'lucide-react';
 import PatientRegistration from '../components/receptionist/PatientRegistration';
 import AppointmentBooking from '../components/receptionist/AppointmentBooking';
 import DailySchedule from '../components/receptionist/DailySchedule';
@@ -48,6 +48,14 @@ export default function ReceptionistDashboard() {
                 )}
               </div>
               <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => handleNavigate('/subscription')}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <CreditCard size={18} />
+                  <span className="hidden sm:inline">Subscription</span>
+                  <span className="sm:hidden">Plan</span>
+                </button>
                 <button
                   onClick={handleLogout}
                   disabled={isLoading}
