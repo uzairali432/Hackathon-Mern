@@ -57,6 +57,13 @@ export const userApi = createApi({
         body: { plan, status, expiresAt },
       }),
     }),
+    checkoutSubscription: builder.mutation({
+      query: ({ plan }) => ({
+        url: '/users/subscription/checkout',
+        method: 'POST',
+        body: { plan },
+      }),
+    }),
     getAnalytics: builder.query({
       query: () => ({
         url: '/users/analytics',
@@ -99,6 +106,7 @@ export const {
   useDeactivateAccountMutation,
   useDeleteUserMutation,
   useUpdateSubscriptionMutation,
+  useCheckoutSubscriptionMutation,
   useGetAnalyticsQuery,
   useGetSystemUsageQuery,
   useGetSystemHealthQuery,
