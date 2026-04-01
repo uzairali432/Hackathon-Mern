@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import { ApiError } from '../utils/ApiError.js';
+import { createSubscriptionCheckoutSession } from './stripeService.js';
 
 export class UserService {
   /**
@@ -113,22 +114,7 @@ export class UserService {
       throw new ApiError('User not found', 404);
     }
 
-    const allowedPlans = ['basic', 'pro'];
-    if (!data?.plan || !allowedPlans.includes(data.plan)) {
-      throw new ApiError('Invalid plan. Allowed plans are: basic, pro', 400);
-    }
-
-    const durationDays = data.plan === 'pro' ? 30 : 30;
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + durationDays);
-
-    user.subscription = user.subscription || {};
-    user.subscription.plan = data.plan;
-    user.subscription.status = 'active';
-    user.subscription.expiresAt = expiresAt;
-
-    await user.save();
-    return user;
+    return createSubscriptionCheckoutSession(user, data?.plan);
   }
 
   /**

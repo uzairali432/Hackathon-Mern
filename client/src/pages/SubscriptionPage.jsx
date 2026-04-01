@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { ArrowLeft, CheckCircle2, AlertCircle, CreditCard, Sparkles, ShieldCheck } from 'lucide-react';
 import { useCheckoutSubscriptionMutation } from '../services/userApi';
-import { setUser } from '../store/slices/authSlice';
 
 const PLANS = [
   {
@@ -33,7 +32,7 @@ const formatDate = (value) => {
 
 export default function SubscriptionPage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user, loading: isAuthLoading } = useSelector((state) => state.auth);
   const [selectedPlan, setSelectedPlan] = useState('pro');
   const [checkoutSubscription, { isLoading }] = useCheckoutSubscriptionMutation();
@@ -46,6 +45,26 @@ export default function SubscriptionPage() {
   const currentStatus = useMemo(() => String(effectiveSubscription?.status || 'inactive').toLowerCase(), [effectiveSubscription]);
   const isCurrentSelectionActive = selectedPlan === currentPlan && currentStatus === 'active';
   const showSkeletons = isAuthLoading || !user;
+
+  useEffect(() => {
+    const status = searchParams.get('status');
+    if (!status) return;
+
+    if (status === 'success') {
+      setSuccessMessage('Payment completed. Your subscription will update shortly.');
+      setErrorMessage('');
+    }
+
+    if (status === 'cancelled') {
+      setErrorMessage('Checkout was cancelled. No charge was made.');
+      setSuccessMessage('');
+    }
+
+    const cleanedParams = new URLSearchParams(searchParams);
+    cleanedParams.delete('status');
+    cleanedParams.delete('session_id');
+    setSearchParams(cleanedParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const getDashboardUrl = () => {
     switch (user?.role) {
@@ -67,22 +86,17 @@ export default function SubscriptionPage() {
 
     try {
       setErrorMessage('');
-      setSuccessMessage(`Updating to ${selectedPlan.toUpperCase()}...`);
-      setOptimisticSubscription({
-        ...(user?.subscription || {}),
-        plan: selectedPlan,
-        status: 'active',
-      });
+      setSuccessMessage(`Starting secure checkout for ${selectedPlan.toUpperCase()}...`);
+      setOptimisticSubscription(null);
 
       const response = await checkoutSubscription({ plan: selectedPlan }).unwrap();
-      const updatedUser = response?.data;
+      const checkoutUrl = response?.data?.checkoutUrl;
 
-      if (updatedUser) {
-        dispatch(setUser(updatedUser));
+      if (!checkoutUrl) {
+        throw new Error('Stripe checkout URL was not returned by the server.');
       }
 
-      setOptimisticSubscription(null);
-      setSuccessMessage(`Subscription upgraded to ${selectedPlan.toUpperCase()} successfully.`);
+      window.location.assign(checkoutUrl);
     } catch (error) {
       setOptimisticSubscription(null);
       setSuccessMessage('');
@@ -244,7 +258,7 @@ export default function SubscriptionPage() {
                 <ShieldCheck className="w-4 h-4" /> Billing Note
               </h3>
               <p className="mt-2 text-sm text-[#065F46]">
-                This environment uses simulated checkout for hackathon demos. Plan activation is immediate.
+                Payments are processed securely by Stripe. Subscription status is synchronized via webhook events.
               </p>
             </div>
           </aside>

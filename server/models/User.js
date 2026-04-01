@@ -47,10 +47,16 @@ const userSchema = new mongoose.Schema(
       default: '',
       maxlength: [500, 'Bio cannot exceed 500 characters'],
     },
+    stripeCustomerId: {
+      type: String,
+      default: null,
+      index: true,
+    },
     subscription: {
       plan: { type: String, enum: ['free', 'basic', 'pro'], default: 'free' },
       status: { type: String, enum: ['active', 'inactive', 'past_due'], default: 'inactive' },
       expiresAt: { type: Date, default: null },
+      stripeSubscriptionId: { type: String, default: null },
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

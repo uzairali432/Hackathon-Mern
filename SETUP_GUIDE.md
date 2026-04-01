@@ -28,6 +28,15 @@ MONGODB_URI=mongodb://localhost:27017/mern-boilerplate
 JWT_SECRET=your-super-secret-key-change-in-production
 JWT_REFRESH_SECRET=your-refresh-secret-change-in-production
 CORS_ORIGIN=http://localhost:5173
+
+# Stripe (required for paid subscription checkout)
+APP_URL=http://localhost:5173
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRICE_BASIC=price_...
+STRIPE_PRICE_PRO=price_...
+STRIPE_SUCCESS_URL=http://localhost:5173/subscription?status=success
+STRIPE_CANCEL_URL=http://localhost:5173/subscription?status=cancelled
 ```
 
 ### 1.3 Start Backend
@@ -179,6 +188,9 @@ pnpm run lint       # Run linter
 | MONGODB_URI | - | MongoDB connection string |
 | JWT_SECRET | - | JWT signing secret |
 | CORS_ORIGIN | http://localhost:5173 | Frontend URL |
+| STRIPE_SECRET_KEY | - | Stripe secret key for checkout/webhooks |
+| STRIPE_WEBHOOK_SECRET | - | Stripe webhook signing secret |
+| STRIPE_PRICE_BASIC / STRIPE_PRICE_PRO | - | Stripe recurring price IDs for plans |
 
 ### Frontend (.env)
 | Variable | Default | Purpose |

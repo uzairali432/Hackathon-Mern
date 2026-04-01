@@ -7,6 +7,7 @@ import morgan from 'morgan';
 import xss from 'xss-clean';
 
 import { config } from './config/environment.js';
+import * as userController from './controllers/userController.js';
 import authRoutes from './routes/v1/authRoutes.js';
 import userRoutes from './routes/v1/userRoutes.js';
 import doctorRoutes from './routes/v1/doctorRoutes.js';
@@ -17,6 +18,13 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { ApiError } from './utils/ApiError.js';
 
 const app = express();
+
+// Stripe webhook must receive the raw body for signature verification.
+app.post(
+  '/api/v1/users/subscription/webhook',
+  express.raw({ type: 'application/json' }),
+  userController.stripeWebhook
+);
 
 // ========================
 // Trust proxy - for production

@@ -21,6 +21,7 @@ if (missingEnvVars.length > 0) {
 export const config = {
   port: process.env.PORT || 5000,
   nodeEnv: process.env.NODE_ENV || 'development',
+  appUrl: process.env.APP_URL || process.env.CORS_ORIGIN || 'http://localhost:5173',
   mongodb: {
     uri: process.env.MONGODB_URI,
   },
@@ -41,5 +42,15 @@ export const config = {
   rateLimit: {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10),
     maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
+  },
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY,
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+    successUrl: process.env.STRIPE_SUCCESS_URL || `${process.env.APP_URL || process.env.CORS_ORIGIN || 'http://localhost:5173'}/subscription?status=success`,
+    cancelUrl: process.env.STRIPE_CANCEL_URL || `${process.env.APP_URL || process.env.CORS_ORIGIN || 'http://localhost:5173'}/subscription?status=cancelled`,
+    prices: {
+      basic: process.env.STRIPE_PRICE_BASIC,
+      pro: process.env.STRIPE_PRICE_PRO,
+    },
   },
 };

@@ -4,6 +4,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { userValidators } from '../validators/userValidator.js';
 import { UserService } from '../services/userService.js';
 import { SystemUsageService } from '../services/systemUsageService.js';
+import { handleStripeWebhookEvent } from '../services/stripeService.js';
 
 /**
  * Validate request body against schema
@@ -89,10 +90,29 @@ export const updateSubscription = asyncHandler(async (req, res) => {
 export const checkoutSubscription = asyncHandler(async (req, res) => {
   const { plan } = req.body;
 
-  const user = await UserService.checkoutSubscription(req.user._id, { plan });
+  const checkout = await UserService.checkoutSubscription(req.user._id, { plan });
 
-  res.status(200).json(new ApiResponse(200, user, 'Subscription checkout completed successfully'));
+  res.status(200).json(new ApiResponse(200, checkout, 'Stripe checkout session created successfully'));
 });
+
+/**
+ * Stripe webhook callback
+ * POST /api/v1/users/subscription/webhook
+ */
+export const stripeWebhook = async (req, res) => {
+  const signature = req.headers['stripe-signature'];
+
+  if (!signature) {
+    return res.status(400).json(new ApiResponse(400, null, 'Missing Stripe signature header'));
+  }
+
+  try {
+    await handleStripeWebhookEvent(req.body, signature);
+    return res.status(200).json({ received: true });
+  } catch (error) {
+    return res.status(400).json(new ApiResponse(400, null, error.message || 'Invalid Stripe webhook event'));
+  }
+};
 
 /**
  * Update user profile
