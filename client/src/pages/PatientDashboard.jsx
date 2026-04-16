@@ -2,6 +2,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useLogoutMutation } from '../services/authApi';
 import { useGetAllUsersQuery } from '../services/userApi';
+import { useGetPatientAppointmentsQuery } from '../services/patientApi';
 import { logout as logoutAction } from '../store/slices/authSlice';
 import { 
   LogOut, 
@@ -27,8 +28,30 @@ export default function PatientDashboard() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const [logout, { isLoading }] = useLogoutMutation();
+  const { data: appointmentsData, isLoading: isLoadingAppointments } = useGetPatientAppointmentsQuery();
   const { data: doctorsData, isLoading: isLoadingDoctors } = useGetAllUsersQuery({ role: 'doctor' });
   const doctors = doctorsData?.users || [];
+  const appointments = appointmentsData?.data || [];
+
+  const upcomingAppointment = appointments
+    .filter((appointment) => ['scheduled', 'in-progress'].includes(appointment.status))
+    .filter((appointment) => new Date(appointment.startTime).getTime() >= Date.now())
+    .sort((left, right) => new Date(left.startTime) - new Date(right.startTime))[0];
+
+  const formatAppointmentDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const formatAppointmentTime = (date) => {
+    return new Date(date).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   const handleLogout = async () => {
     try {
@@ -200,11 +223,11 @@ export default function PatientDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-[15px] font-bold text-[#212529] truncate">Dr. {doctor.firstName} {doctor.lastName}</h3>
-                        <p className="text-xs font-medium text-[#2E86AB] mb-1">Medical Specialist</p>
+                        <p className="text-xs font-medium text-[#2E86AB] mb-1">{doctor.specialization || 'Medical Specialist'}</p>
                         <div className="flex items-center gap-1.5 mt-1.5">
                            <div className="flex items-center text-amber-400">
                              <Star className="w-3.5 h-3.5 fill-current" />
-                             <span className="text-xs font-bold text-[#495057] ml-1">4.9 {doctor.reviews ? `(${doctor.reviews})` : ''}</span>
+                             <span className="text-xs font-bold text-[#495057] ml-1">Available specialist</span>
                            </div>
                         </div>
                       </div>
@@ -237,33 +260,61 @@ export default function PatientDashboard() {
                   <h2 className="text-lg font-semibold text-[#212529]">Upcoming Appointment</h2>
                   <button className="text-sm font-medium text-[#00A896] hover:text-[#028F7E]">View all</button>
                 </div>
-                
-                <div className="bg-white rounded-2xl p-6 border border-[#E9ECEF] shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 rounded-full bg-[#E9ECEF] flex-shrink-0 overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name=Dr.+Smith&background=F8F9FA&color=2E86AB" alt="Dr. Smith" className="w-full h-full object-cover" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-[#212529]">Dr. Sarah Smith</h3>
-                        <p className="text-[#6C757D] text-sm mb-2">Cardiologist • General Checkup</p>
-                        <div className="flex items-center gap-4 text-sm font-medium text-[#2E86AB] bg-blue-50 px-3 py-1.5 rounded-lg inline-flex">
-                          <Calendar className="w-4 h-4" />
-                          Thu, Oct 12 • 10:30 AM
+
+                {isLoadingAppointments ? (
+                  <div className="bg-white rounded-2xl p-6 border border-[#E9ECEF] shadow-sm animate-pulse">
+                    <div className="h-5 w-1/3 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-4 w-2/3 bg-gray-100 rounded mb-3"></div>
+                    <div className="h-4 w-1/2 bg-gray-100 rounded"></div>
+                  </div>
+                ) : upcomingAppointment ? (
+                  <div className="bg-white rounded-2xl p-6 border border-[#E9ECEF] shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-14 h-14 rounded-full bg-[#E9ECEF] flex-shrink-0 overflow-hidden flex items-center justify-center">
+                          {upcomingAppointment.doctorId ? (
+                            <img
+                              src={`https://ui-avatars.com/api/?name=Dr.+${upcomingAppointment.doctorId.firstName}+${upcomingAppointment.doctorId.lastName}&background=F8F9FA&color=2E86AB`}
+                              alt={`Dr. ${upcomingAppointment.doctorId.firstName} ${upcomingAppointment.doctorId.lastName}`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Calendar className="w-6 h-6 text-[#2E86AB]" />
+                          )}
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-[#212529]">
+                            {upcomingAppointment.title}
+                          </h3>
+                          <p className="text-[#6C757D] text-sm mb-2">
+                            {upcomingAppointment.doctorId
+                              ? `Dr. ${upcomingAppointment.doctorId.firstName} ${upcomingAppointment.doctorId.lastName}${upcomingAppointment.doctorId.specialization ? ` • ${upcomingAppointment.doctorId.specialization}` : ''}`
+                              : 'Upcoming visit'}
+                          </p>
+                          <div className="flex items-center gap-4 text-sm font-medium text-[#2E86AB] bg-blue-50 px-3 py-1.5 rounded-lg inline-flex">
+                            <Calendar className="w-4 h-4" />
+                            {formatAppointmentDate(upcomingAppointment.startTime)} • {formatAppointmentTime(upcomingAppointment.startTime)}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex flex-col sm:flex-row gap-3 md:flex-col lg:flex-row w-full md:w-auto">
-                      <button className="flex-1 lg:flex-none px-5 py-2.5 bg-white border border-[#DEE2E6] text-[#495057] rounded-xl text-sm font-medium hover:bg-[#F8F9FA] transition-colors focus:ring-2 focus:ring-[#00A896]/20 outline-none">
-                        Reschedule
-                      </button>
-                      <button className="flex-1 lg:flex-none px-5 py-2.5 bg-[#00A896] text-white rounded-xl text-sm font-medium hover:bg-[#028F7E] transition-colors shadow-sm focus:ring-2 focus:ring-[#00A896]/50 outline-none">
-                        Join Telehealth
-                      </button>
+
+                      <div className="flex flex-col sm:flex-row gap-3 md:flex-col lg:flex-row w-full md:w-auto">
+                        <button className="flex-1 lg:flex-none px-5 py-2.5 bg-white border border-[#DEE2E6] text-[#495057] rounded-xl text-sm font-medium hover:bg-[#F8F9FA] transition-colors focus:ring-2 focus:ring-[#00A896]/20 outline-none">
+                          View Appointments
+                        </button>
+                        <button className="flex-1 lg:flex-none px-5 py-2.5 bg-[#00A896] text-white rounded-xl text-sm font-medium hover:bg-[#028F7E] transition-colors shadow-sm focus:ring-2 focus:ring-[#00A896]/50 outline-none">
+                          Join Telehealth
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="bg-white rounded-2xl p-6 border border-dashed border-[#DEE2E6] text-center shadow-sm">
+                    <Calendar className="w-10 h-10 text-[#A0AEC0] mx-auto mb-3" />
+                    <h3 className="text-lg font-semibold text-[#212529] mb-1">No upcoming appointment</h3>
+                    <p className="text-sm text-[#6C757D]">Your next visit will appear here once it is scheduled.</p>
+                  </div>
+                )}
               </section>
 
               {/* Medication Schedule */}
