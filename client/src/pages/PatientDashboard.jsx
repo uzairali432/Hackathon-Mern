@@ -20,7 +20,8 @@ import {
   PhoneCall,
   ShieldCheck,
   Star,
-  CreditCard
+  CreditCard,
+  AlertCircle
 } from 'lucide-react';
 
 export default function PatientDashboard() {
@@ -28,8 +29,8 @@ export default function PatientDashboard() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const [logout, { isLoading }] = useLogoutMutation();
-  const { data: appointmentsData, isLoading: isLoadingAppointments } = useGetPatientAppointmentsQuery();
-  const { data: doctorsData, isLoading: isLoadingDoctors } = useGetAllUsersQuery({ role: 'doctor' });
+  const { data: appointmentsData, isLoading: isLoadingAppointments, error: appointmentsError, refetch: refetchAppointments } = useGetPatientAppointmentsQuery();
+  const { data: doctorsData, isLoading: isLoadingDoctors, error: doctorsError, refetch: refetchDoctors } = useGetAllUsersQuery({ role: 'doctor' });
   const doctors = doctorsData?.users || [];
   const appointments = appointmentsData?.data || [];
 
@@ -70,12 +71,12 @@ export default function PatientDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-[#212529] font-['Inter'] selection:bg-teal-100 selection:text-teal-900">
+    <div className="min-h-screen bg-[#F8F9FA] text-[#212529] font-['Inter'] selection:bg-teal-100 selection:text-teal-900 pb-24 lg:pb-0">
       
       {/* Top Header Navigation */}
       <nav className="bg-white border-b border-[#E9ECEF] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center py-3 sm:py-0 min-h-16">
             
             {/* Logo area */}
             <div className="flex items-center gap-2 cursor-pointer">
@@ -102,7 +103,7 @@ export default function PatientDashboard() {
             </div>
 
             {/* Right Header Icons */}
-            <div className="flex items-center gap-3 sm:gap-5">
+            <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-5 w-full sm:w-auto">
               <button className="relative p-2 text-[#6C757D] hover:text-[#00A896] transition-colors rounded-full hover:bg-teal-50">
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1.5 right-1.5 block h-2.5 w-2.5 rounded-full bg-[#DC3545] border-2 border-white"></span>
@@ -172,7 +173,7 @@ export default function PatientDashboard() {
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 w-full pt-6 pb-12 px-4 sm:px-6 lg:pl-10 lg:pr-8">
+        <main className="flex-1 w-full pt-6 pb-20 lg:pb-12 px-4 sm:px-6 lg:pl-10 lg:pr-8">
           
           <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
@@ -187,6 +188,32 @@ export default function PatientDashboard() {
             </button>
           </div>
 
+          {(doctorsError || appointmentsError) && (
+            <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-white border border-red-100 flex items-center justify-center flex-shrink-0">
+                  <AlertCircle className="w-5 h-5 text-[#DC3545]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#DC3545]">Some dashboard data could not be loaded</h3>
+                  <p className="text-sm text-red-900/70">You can still use the rest of the dashboard while we retry the latest records.</p>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                {doctorsError && (
+                  <button onClick={() => refetchDoctors()} className="px-4 py-2 rounded-xl bg-white border border-red-200 text-[#DC3545] text-sm font-semibold hover:bg-red-50 transition-colors">
+                    Retry doctors
+                  </button>
+                )}
+                {appointmentsError && (
+                  <button onClick={() => refetchAppointments()} className="px-4 py-2 rounded-xl bg-white border border-red-200 text-[#DC3545] text-sm font-semibold hover:bg-red-50 transition-colors">
+                    Retry appointments
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Doctors List */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
@@ -195,9 +222,9 @@ export default function PatientDashboard() {
             </div>
             
             {isLoadingDoctors ? (
-              <div className="flex space-x-4 overflow-hidden">
+              <div className="flex space-x-4 overflow-x-auto pb-2 hide-scrollbar snap-x">
                  {[1,2,3,4].map(i => (
-                   <div key={i} className="min-w-[260px] h-[140px] bg-white rounded-2xl border border-[#E9ECEF] p-5 shadow-sm animate-pulse flex flex-col justify-between">
+                   <div key={i} className="min-w-[260px] h-[140px] bg-white rounded-2xl border border-[#E9ECEF] p-5 shadow-sm animate-pulse flex flex-col justify-between snap-start">
                       <div className="flex gap-4">
                         <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
                         <div className="flex-1 py-1 space-y-2">
@@ -245,6 +272,9 @@ export default function PatientDashboard() {
                 <Stethoscope className="w-10 h-10 text-[#A0AEC0] mx-auto mb-3" />
                 <h3 className="text-lg font-medium text-[#495057] mb-1">No doctors available</h3>
                 <p className="text-sm text-[#6C757D]">Check back later for available specialists.</p>
+                <button onClick={() => refetchDoctors()} className="mt-4 px-4 py-2 rounded-xl border border-[#DEE2E6] text-sm font-semibold text-[#495057] hover:bg-[#F8F9FA] transition-colors">
+                  Refresh list
+                </button>
               </div>
             )}
           </div>
@@ -313,6 +343,9 @@ export default function PatientDashboard() {
                     <Calendar className="w-10 h-10 text-[#A0AEC0] mx-auto mb-3" />
                     <h3 className="text-lg font-semibold text-[#212529] mb-1">No upcoming appointment</h3>
                     <p className="text-sm text-[#6C757D]">Your next visit will appear here once it is scheduled.</p>
+                    <button onClick={() => refetchAppointments()} className="mt-4 px-4 py-2 rounded-xl border border-[#DEE2E6] text-sm font-semibold text-[#495057] hover:bg-[#F8F9FA] transition-colors">
+                      Refresh appointments
+                    </button>
                   </div>
                 )}
               </section>

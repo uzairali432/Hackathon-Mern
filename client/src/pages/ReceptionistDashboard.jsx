@@ -30,13 +30,13 @@ export default function ReceptionistDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
       {/* Header */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 h-auto sm:h-16 py-3 sm:py-0">
+          <div className="flex flex-col gap-3 sm:flex-row justify-between sm:items-center h-auto sm:h-16 py-3 sm:py-0">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Receptionist Dashboard</h1>
+              <h1 className="text-2xl font-bold text-gray-900 leading-tight">Receptionist Dashboard</h1>
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
               <div className="flex items-center gap-3">
@@ -72,10 +72,10 @@ export default function ReceptionistDashboard() {
       </nav>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Appointments Card */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center gap-4">
               <div className="bg-blue-100 rounded-full p-3">
                 <Calendar className="text-blue-600" size={24} />
@@ -94,7 +94,7 @@ export default function ReceptionistDashboard() {
           </div>
 
           {/* Patient Records Card */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center gap-4">
               <div className="bg-green-100 rounded-full p-3">
                 <Users className="text-green-600" size={24} />
@@ -115,13 +115,13 @@ export default function ReceptionistDashboard() {
 
         {/* Receptionist Tools */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div>
+          <div className="min-w-0">
             <PatientRegistration />
           </div>
-          <div>
+          <div className="min-w-0">
             <AppointmentBooking />
           </div>
-          <div>
+          <div className="min-w-0">
             <DailySchedule />
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function ReceptionistDashboard() {
         {/* Profile & Settings Cards */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Profile Card */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center gap-4">
               <div className="bg-purple-100 rounded-full p-3">
                 <User className="text-purple-600" size={24} />
@@ -148,7 +148,7 @@ export default function ReceptionistDashboard() {
           </div>
 
           {/* Settings Card */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center gap-4">
               <div className="bg-indigo-100 rounded-full p-3">
                 <Settings className="text-indigo-600" size={24} />
@@ -169,15 +169,15 @@ export default function ReceptionistDashboard() {
 
         {/* Quick Stats */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <p className="text-gray-500 text-sm">Status</p>
             <p className="text-2xl font-bold text-blue-600 mt-2">Active</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <p className="text-gray-500 text-sm">Department</p>
             <p className="text-2xl font-bold text-green-600 mt-2">Reception</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <p className="text-gray-500 text-sm">Shift</p>
             <p className="text-2xl font-bold text-purple-600 mt-2">Day</p>
           </div>
