@@ -1,282 +1,196 @@
-# 🏥 AI Clinic Management + Smart Diagnosis SaaS  
-### 🚀 Final Hackathon – Batch 15  
-
-A full-stack AI-powered Clinic Management SaaS built using the MERN stack.  
-This platform digitizes clinic operations, improves efficiency, and provides intelligent AI assistance for doctors.
-
-> This project was developed as a Final Hackathon submission and is designed with real startup potential.
-
----
-
-## 🌟 Problem Statement
-
-Many small and medium clinics still rely on:
-- Paper-based prescriptions
-- Manual patient records
-- No digital appointment tracking
-- No analytics or reporting
-- No AI support for diagnosis
-
-This leads to:
-- Data loss
-- Time waste
-- Inefficient patient handling
-- No performance visibility
-
-This system solves all of the above by providing a complete digital and AI-assisted clinic solution.
-
----
-
-## 🛠 Tech Stack (Final Hackathon – Advanced MERN)
-
-### Frontend
-- React.js
-- React Router
-- Redux Toolkit + RTK Query
-- Tailwind CSS
-- Chart.js / Recharts
-- Axios
-
-### Backend
-- Node.js
-- Express.js
-- MongoDB + Mongoose
-- JWT Authentication
-- Role-Based Access Control (RBAC)
-- Cloudinary / Supabase Storage
-- PDF Generation (Prescription Download)
-
-### AI Integration
-- Gemini API / OpenAI API
-- Backend AI endpoint handling
-- Graceful fallback if AI fails
-
----
-
-## 👥 User Roles (4 Roles Implemented)
-
-### 🔐 Admin
-- Manage doctors & receptionists
-- View system analytics
-- Monitor system usage
-- Manage subscription plans (Free / Pro simulation)
-
-### 👨‍⚕️ Doctor
-- View appointments
-- Access patient history timeline
-- Add diagnosis
-- Generate prescriptions
-- Use AI smart diagnosis
-- View personal analytics
-
-### 🧑‍💼 Receptionist
-- Register new patients
-- Book appointments
-- Update patient information
-- Manage daily schedule
-
-### 🧑 Patient
-- Secure login
-- View profile
-- View appointment history
-- Download prescriptions (PDF)
-- View AI-generated explanations
-
----
-
-## 🏥 Core Features
-
-### 🔐 Authentication & Authorization
-- Secure JWT login
-- Role-based dashboard
-- Protected routes
-- Input validation
-
-### 👤 Patient Management
-- Add / Edit patients
-- View patient profile
-- Medical history timeline
-- Timestamp tracking
-
-### 📅 Appointment Management
-- Book appointment
-- Cancel appointment
-- Update status (Pending / Confirmed / Completed)
-- Doctor schedule view
-
-### 💊 Prescription System
-- Add medicines
-- Add dosage & notes
-- Generate downloadable PDF
-- AI-based prescription explanation
-
----
-
-## 🤖 AI Features
-
-### 1️⃣ Smart Symptom Checker
-Doctor enters:
-- Symptoms
-- Age
-- Gender
-- History
-
-AI returns:
-- Possible conditions
-- Risk level
-- Suggested tests
-
-### 2️⃣ Prescription Explanation
-- Simple explanation for patient
-- Lifestyle recommendations
-- Preventive advice
-- Optional Urdu explanation mode
-
-### 3️⃣ Risk Flagging
-System detects:
-- Repeated infections
-- Chronic patterns
-- High-risk combinations
-
-### 4️⃣ Predictive Analytics (Final Hackathon)
-- Most common disease this month
-- Patient load forecast
-- Doctor performance trends
-
----
-
-## 📊 Analytics Dashboard
-
-### Admin Dashboard
-- Total patients
-- Total doctors
-- Monthly appointments
-- Simulated revenue
-- Most common diagnosis
-
-### Doctor Dashboard
-- Daily appointments
-- Monthly stats
-- Prescription count
-
----
-
-## 💼 SaaS Subscription Simulation
-
-### 🆓 Free Plan
-- Limited patients
-- AI features disabled
-- Basic analytics
-
-### 💎 Pro Plan
-- Unlimited patients
-- AI features enabled
-- Advanced analytics
-
-Feature-based access control implemented.
-
----
-
-## 🗂 Database Structure
-
-### Users
-- id
-- name
-- email
-- password
-- role
-- subscriptionPlan
-
-### Patients
-- id
-- name
-- age
-- gender
-- contact
-- createdBy
-
-### Appointments
-- id
-- patientId
-- doctorId
-- date
-- status
-
-### Prescriptions
-- id
-- patientId
-- doctorId
-- medicines[]
-- instructions
-- createdAt
-
-### DiagnosisLogs
-- id
-- symptoms
-- aiResponse
-- riskLevel
-- createdAt
-
----
-
-## 🎨 UI Features
-- Clean medical theme
-- Sidebar navigation
-- Fully responsive design
-- Loading states
-- Proper error handling
-- Form validation
-
----
-
-## 🚀 Deployment
-
-Frontend: (Vercel / Netlify)  
-Backend: (Render / Railway / Cyclic)  
-Database: MongoDB Atlas  
-
-Live Demo: [Add your deployed URL here]  
-GitHub Repo: [Add your repository link here]  
-Demo Video: [Add YouTube / LinkedIn demo link here]
-
----
-
-## 💡 Future Enhancements (Startup Ready)
-
-- SMS reminders
-- WhatsApp integration
-- Billing module
-- Payment gateway
-- Multi-clinic support
-- Doctor availability auto-sync
-- Real SaaS subscription integration
-
----
-
-## 📌 Submission Checklist
-
-- ✅ Deployed Live App
-- ✅ Public GitHub Repository
-- ✅ Clean Commit History
-- ✅ Demo Video (3–7 minutes)
-- ✅ Proper README
-
----
-
-## 👨‍💻 Developer
-
-Final Hackathon – Batch 15  
-Built with dedication, scalability, and real-world startup vision.
-
----
-
-## 📄 License
-
-This project is built for educational and hackathon purposes.  
-Open for future commercial expansion.
-
----
-
-⭐ If you like this project, give it a star on GitHub!
-
-MADE BY UZAIR ALI
+# AI Clinic Management SaaS
+
+Production-ready MERN application for clinic operations with role-based dashboards, analytics, and Stripe-backed subscription flows.
+
+## Overview
+
+This repository contains:
+
+- `client/`: React + Vite frontend
+- `server/`: Express + MongoDB API
+- Root scripts to run both services together
+
+Core capabilities:
+
+- JWT authentication with refresh tokens
+- Role-based access control (admin, doctor, receptionist, patient)
+- Patient and appointment management
+- Prescription and diagnosis workflows
+- Analytics endpoints and dashboards
+- Stripe subscription checkout and webhook handling
+
+## Tech Stack
+
+- Frontend: React 19, React Router, Redux Toolkit, Tailwind CSS, Vite
+- Backend: Node.js, Express, MongoDB (Mongoose), Joi validation
+- Auth/Security: JWT, helmet, rate limiting, hpp, xss-clean, CORS
+- Billing: Stripe subscriptions
+
+## Monorepo Layout
+
+```text
+.
+|- client/
+|- server/
+|- components/
+|- public/
+|- README.md
+|- SETUP_GUIDE.md
+|- JWT_AUTH_GUIDE.md
+|- vercel.json
+```
+
+## Quick Start
+
+### 1) Install dependencies
+
+At the repository root:
+
+```bash
+pnpm install
+pnpm --dir server install
+pnpm --dir client install
+```
+
+### 2) Configure environment files
+
+Backend:
+
+```bash
+cd server
+cp .env.example .env
+```
+
+Frontend:
+
+```bash
+cd client
+cp .env.example .env
+```
+
+### 3) Run in development
+
+From root:
+
+```bash
+pnpm run dev
+```
+
+This starts:
+
+- Frontend on `http://localhost:5173`
+- Backend on `http://localhost:5000`
+
+## Root Scripts
+
+```bash
+pnpm run dev           # Run client + server concurrently
+pnpm run dev:server    # Run server only
+pnpm run dev:client    # Run client only
+pnpm run build         # Build frontend (client)
+pnpm run start         # Start server in production mode
+pnpm run lint          # Lint workspace
+```
+
+## Environment Variables
+
+### Backend (`server/.env`)
+
+```env
+PORT=5000
+NODE_ENV=development
+
+MONGODB_URI=mongodb://localhost:27017/mern-boilerplate
+
+JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
+JWT_EXPIRE=7d
+JWT_REFRESH_SECRET=your_super_secret_refresh_key_change_this_in_production
+JWT_REFRESH_EXPIRE=30d
+
+CORS_ORIGIN=http://localhost:5173
+APP_URL=http://localhost:5173
+
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRICE_BASIC=
+STRIPE_PRICE_PRO=
+STRIPE_SUCCESS_URL=http://localhost:5173/subscription?status=success
+STRIPE_CANCEL_URL=http://localhost:5173/subscription?status=cancelled
+```
+
+### Frontend (`client/.env`)
+
+```env
+VITE_API_URL=http://localhost:5000/api/v1
+VITE_APP_NAME=MERN Boilerplate
+VITE_APP_ENV=development
+```
+
+## API Base URL
+
+All API routes are mounted under:
+
+```text
+/api/v1
+```
+
+Key route groups currently wired in the server:
+
+- `/auth`
+- `/users`
+- `/doctors`
+- `/receptionists`
+- `/patients`
+- `/analytics`
+
+Health check:
+
+```text
+GET /api/v1/health
+```
+
+## Stripe Subscriptions
+
+Webhook endpoint is configured on the backend at:
+
+```text
+POST /api/v1/users/subscription/webhook
+```
+
+Important notes:
+
+- Use the exact Stripe webhook secret in `STRIPE_WEBHOOK_SECRET`
+- Ensure your deployed webhook points to the backend URL
+- Keep price IDs (`STRIPE_PRICE_BASIC`, `STRIPE_PRICE_PRO`) synced with Stripe
+
+## Deployment
+
+This repository includes `vercel.json` configured to:
+
+- Build the frontend from `client/`
+- Publish `client/dist`
+- Rewrite app routes to `index.html` for SPA routing
+
+Typical production setup:
+
+- Frontend: Vercel
+- Backend: Render/Railway/Fly/any Node host
+- Database: MongoDB Atlas
+
+## Additional Documentation
+
+- `SETUP_GUIDE.md`: step-by-step local setup and troubleshooting
+- `JWT_AUTH_GUIDE.md`: authentication architecture and flow
+- `server/README.md`: backend-specific details
+- `client/README.md`: frontend-specific details
+
+## Troubleshooting
+
+- App loads but API calls fail: verify `VITE_API_URL` and backend port
+- CORS errors: match `CORS_ORIGIN` with your frontend origin
+- Stripe checkout issues: verify secret key, webhook secret, and price IDs
+- Mongo connection errors: validate `MONGODB_URI` and Atlas network access
+
+## License
+
+MIT (see package metadata). Adjust as needed for your project policy.
