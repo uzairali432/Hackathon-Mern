@@ -1,10 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const sanitizeStoredToken = (value) => {
+  if (!value) return null;
+  if (value === 'undefined' || value === 'null') return null;
+  return value;
+};
+
+const getStoredAccessToken = () => sanitizeStoredToken(localStorage.getItem('accessToken'));
+const getStoredRefreshToken = () => sanitizeStoredToken(localStorage.getItem('refreshToken'));
+
 const initialState = {
   user: null,
-  accessToken: localStorage.getItem('accessToken') || null,
-  refreshToken: localStorage.getItem('refreshToken') || null,
-  isAuthenticated: !!localStorage.getItem('accessToken'),
+  accessToken: getStoredAccessToken(),
+  refreshToken: getStoredRefreshToken(),
+  isAuthenticated: Boolean(getStoredAccessToken()),
   loading: false,
   error: null,
 };
@@ -20,11 +29,20 @@ const authSlice = createSlice({
     loginSuccess: (state, action) => {
       state.loading = false;
       state.user = action.payload.user;
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
+      state.accessToken = sanitizeStoredToken(action.payload.accessToken);
+      state.refreshToken = sanitizeStoredToken(action.payload.refreshToken);
       state.isAuthenticated = true;
-      localStorage.setItem('accessToken', action.payload.accessToken);
-      localStorage.setItem('refreshToken', action.payload.refreshToken);
+      if (state.accessToken) {
+        localStorage.setItem('accessToken', state.accessToken);
+      } else {
+        localStorage.removeItem('accessToken');
+      }
+
+      if (state.refreshToken) {
+        localStorage.setItem('refreshToken', state.refreshToken);
+      } else {
+        localStorage.removeItem('refreshToken');
+      }
     },
     loginFailure: (state, action) => {
       state.loading = false;
@@ -40,8 +58,12 @@ const authSlice = createSlice({
       localStorage.removeItem('refreshToken');
     },
     setAccessToken: (state, action) => {
-      state.accessToken = action.payload;
-      localStorage.setItem('accessToken', action.payload);
+      state.accessToken = sanitizeStoredToken(action.payload);
+      if (state.accessToken) {
+        localStorage.setItem('accessToken', state.accessToken);
+      } else {
+        localStorage.removeItem('accessToken');
+      }
     },
     clearError: (state) => {
       state.error = null;

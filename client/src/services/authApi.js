@@ -46,7 +46,7 @@ export const authApi = createApi({
       query: (refreshToken) => ({
         url: '/auth/refresh',
         method: 'POST',
-        body: { refreshToken },
+        body: refreshToken ? { refreshToken } : {},
       }),
     }),
   }),

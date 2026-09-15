@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import { ApiError } from '../utils/ApiError.js';
 import { createSubscriptionCheckoutSession } from './stripeService.js';
+import { confirmSubscriptionCheckoutSession } from './stripeService.js';
 
 export class UserService {
   /**
@@ -94,6 +95,10 @@ export class UserService {
       throw new ApiError('User not found', 404);
     }
 
+    if (user.role !== 'patient') {
+      throw new ApiError('Subscriptions are only available for patient accounts.', 400);
+    }
+
     user.subscription = user.subscription || {};
     if (data.plan) user.subscription.plan = data.plan;
     if (data.status) user.subscription.status = data.status;
@@ -114,7 +119,42 @@ export class UserService {
       throw new ApiError('User not found', 404);
     }
 
-    return createSubscriptionCheckoutSession(user, data?.plan);
+    if (user.role !== 'patient') {
+      throw new ApiError('Only patients can purchase subscriptions.', 403);
+    }
+
+    return createSubscriptionCheckoutSession(user, data?.plan, {
+      successUrl: data?.successUrl,
+      cancelUrl: data?.cancelUrl,
+    });
+  }
+
+  /**
+   * Confirm completed Stripe checkout and sync subscription immediately
+   * @param {string} userId
+   * @param {Object} data
+   */
+  static async confirmSubscriptionCheckout(userId, data) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError('User not found', 404);
+    }
+
+    if (user.role !== 'patient') {
+      throw new ApiError('Only patients can confirm subscriptions.', 403);
+    }
+
+    const sessionId = String(data?.sessionId || '').trim();
+    if (!sessionId) {
+      throw new ApiError('sessionId is required', 400);
+    }
+
+    const updatedUser = await confirmSubscriptionCheckoutSession(user, sessionId);
+
+    return {
+      subscription: updatedUser.subscription,
+      user: updatedUser,
+    };
   }
 
   /**

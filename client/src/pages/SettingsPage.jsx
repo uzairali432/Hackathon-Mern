@@ -216,29 +216,31 @@ export default function SettingsPage() {
            </div>
         </div>
 
-        <div className="mt-6 bg-white rounded-2xl shadow-sm border border-[#E9ECEF] p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#E8F4F8] border border-[#2E86AB]/20 flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-[#2E86AB]" />
+        {user?.role === 'patient' && (
+          <div className="mt-6 bg-white rounded-2xl shadow-sm border border-[#E9ECEF] p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#E8F4F8] border border-[#2E86AB]/20 flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-[#2E86AB]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#212529]">Subscription & Plan</h3>
+                  <p className="text-sm text-[#6C757D] font-medium">
+                    Review your current subscription and upgrade features for your patient account.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-[#212529]">Subscription & Plan</h3>
-                <p className="text-sm text-[#6C757D] font-medium">
-                  Review your current subscription and upgrade features for your clinic.
-                </p>
-              </div>
-            </div>
 
-            <button
-              type="button"
-              onClick={() => navigate('/subscription')}
-              className="px-5 py-2.5 bg-[#2E86AB] text-white rounded-xl hover:bg-[#246D8C] font-semibold transition-all focus:ring-2 focus:ring-[#2E86AB]/40 focus:outline-none"
-            >
-              Manage Subscription
-            </button>
+              <button
+                type="button"
+                onClick={() => navigate('/subscription')}
+                className="px-5 py-2.5 bg-[#2E86AB] text-white rounded-xl hover:bg-[#246D8C] font-semibold transition-all focus:ring-2 focus:ring-[#2E86AB]/40 focus:outline-none"
+              >
+                Manage Subscription
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Security Guidelines */}
         <div className="mt-6 bg-[#E8F4F8] border border-[#2E86AB]/20 rounded-2xl p-6 relative overflow-hidden">

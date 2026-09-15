@@ -4,8 +4,6 @@ import { config } from './environment.js';
 export const connectDatabase = async () => {
   try {
     const conn = await mongoose.connect(config.mongodb.uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
     });
 

@@ -17,7 +17,8 @@ router.get('/:id', userController.getUserById);
 router.put('/profile', authenticate, userController.updateProfile);
 router.post('/change-password', authenticate, userController.changePassword);
 router.post('/deactivate', authenticate, userController.deactivateAccount);
-router.post('/subscription/checkout', authenticate, userController.checkoutSubscription);
+router.post('/subscription/checkout', authenticate, authorize('patient'), userController.checkoutSubscription);
+router.post('/subscription/confirm', authenticate, authorize('patient'), userController.confirmSubscriptionCheckout);
 
 /**
  * Protected routes - Admin only

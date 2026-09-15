@@ -41,6 +41,7 @@ export const signup = asyncHandler(async (req, res) => {
     new ApiResponse(201, {
       user: result.user,
       accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
     }, 'User registered successfully')
   );
 });
@@ -68,6 +69,7 @@ export const login = asyncHandler(async (req, res) => {
     new ApiResponse(200, {
       user: result.user,
       accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
     }, 'Logged in successfully')
   );
 });
@@ -96,6 +98,7 @@ export const refreshToken = asyncHandler(async (req, res) => {
   res.status(200).json(
     new ApiResponse(200, {
       accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     }, 'Token refreshed successfully')
   );
 });

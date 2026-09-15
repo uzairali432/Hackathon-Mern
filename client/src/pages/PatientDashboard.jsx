@@ -33,6 +33,8 @@ export default function PatientDashboard() {
   const { data: doctorsData, isLoading: isLoadingDoctors, error: doctorsError, refetch: refetchDoctors } = useGetAllUsersQuery({ role: 'doctor' });
   const doctors = doctorsData?.users || [];
   const appointments = appointmentsData?.data || [];
+  const currentPlan = String(user?.subscription?.plan || 'free').toUpperCase();
+  const currentPlanStatus = String(user?.subscription?.status || 'inactive');
 
   const upcomingAppointment = appointments
     .filter((appointment) => ['scheduled', 'in-progress'].includes(appointment.status))
@@ -182,10 +184,17 @@ export default function PatientDashboard() {
             </div>
             
             {/* Emergency Contact Button */}
-            <button className="flex items-center justify-center gap-2 bg-[#DC3545]/10 text-[#DC3545] px-4 py-2.5 rounded-lg hover:bg-[#DC3545]/20 hover:scale-[1.02] transition-all font-medium text-sm border border-[#DC3545]/20">
-              <PhoneCall className="w-4 h-4" />
-              Emergency Care
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="inline-flex items-center gap-2 bg-[#ECFDF3] text-[#047857] px-4 py-2.5 rounded-lg border border-[#BBF7D0]">
+                <CreditCard className="w-4 h-4" />
+                <span className="text-sm font-semibold">Plan: {currentPlan}</span>
+                <span className="text-xs uppercase tracking-wide">{currentPlanStatus}</span>
+              </div>
+              <button className="flex items-center justify-center gap-2 bg-[#DC3545]/10 text-[#DC3545] px-4 py-2.5 rounded-lg hover:bg-[#DC3545]/20 hover:scale-[1.02] transition-all font-medium text-sm border border-[#DC3545]/20">
+                <PhoneCall className="w-4 h-4" />
+                Emergency Care
+              </button>
+            </div>
           </div>
 
           {(doctorsError || appointmentsError) && (

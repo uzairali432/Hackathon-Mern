@@ -41,6 +41,14 @@ const mapStripePlanFromPriceId = (priceId) => {
   return 'free';
 };
 
+const normalizeStripePlan = (plan) => {
+  const normalized = String(plan || '').toLowerCase();
+  if (ALLOWED_PLANS.includes(normalized)) {
+    return normalized;
+  }
+  return 'free';
+};
+
 const mapSubscriptionStatus = (status) => {
   if (status === 'active' || status === 'trialing') return 'active';
   if (status === 'past_due' || status === 'unpaid') return 'past_due';
@@ -68,12 +76,23 @@ const ensureCustomerForUser = async (user) => {
   return customer.id;
 };
 
-export const createSubscriptionCheckoutSession = async (user, plan) => {
+export const createSubscriptionCheckoutSession = async (user, plan, options = {}) => {
+  if (user?.role !== 'patient') {
+    throw new ApiError('Only patients can purchase subscriptions.', 403);
+  }
+
   const stripe = getStripeClient();
   const priceId = getPriceIdForPlan(plan);
   const customerId = await ensureCustomerForUser(user);
-  const successUrlHasQuery = config.stripe.successUrl.includes('?');
-  const successUrl = `${config.stripe.successUrl}${successUrlHasQuery ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`;
+  const successBaseUrl = String(options?.successUrl || config.stripe.successUrl || '').trim();
+  const cancelBaseUrl = String(options?.cancelUrl || config.stripe.cancelUrl || '').trim();
+
+  if (!successBaseUrl || !cancelBaseUrl) {
+    throw new ApiError('Stripe success/cancel URLs are not configured.', 500);
+  }
+
+  const successUrlHasQuery = successBaseUrl.includes('?');
+  const successUrl = `${successBaseUrl}${successUrlHasQuery ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`;
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
@@ -86,7 +105,7 @@ export const createSubscriptionCheckoutSession = async (user, plan) => {
       },
     ],
     success_url: successUrl,
-    cancel_url: config.stripe.cancelUrl,
+    cancel_url: cancelBaseUrl,
     metadata: {
       userId: String(user._id),
       plan: String(plan).toLowerCase(),
@@ -97,6 +116,79 @@ export const createSubscriptionCheckoutSession = async (user, plan) => {
     sessionId: session.id,
     checkoutUrl: session.url,
   };
+};
+
+export const confirmSubscriptionCheckoutSession = async (user, sessionId) => {
+  if (user?.role !== 'patient') {
+    throw new ApiError('Only patients can confirm subscriptions.', 403);
+  }
+
+  const stripe = getStripeClient();
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ['subscription'],
+  });
+
+  if (!session || session.mode !== 'subscription') {
+    throw new ApiError('Invalid Stripe checkout session.', 400);
+  }
+
+  const metadataUserId = String(session.metadata?.userId || '');
+  if (!metadataUserId || metadataUserId !== String(user._id)) {
+    throw new ApiError('Checkout session does not belong to the authenticated user.', 403);
+  }
+
+  const sessionStatus = String(session.status || '').toLowerCase();
+  if (sessionStatus !== 'complete') {
+    throw new ApiError('Payment is not completed yet for this checkout session.', 400);
+  }
+
+  const paymentStatus = String(session.payment_status || '').toLowerCase();
+
+  if (session.customer && !user.stripeCustomerId) {
+    user.stripeCustomerId = String(session.customer);
+    await user.save();
+  }
+
+  const subscriptionId =
+    typeof session.subscription === 'string'
+      ? session.subscription
+      : session.subscription?.id;
+
+  if (!subscriptionId) {
+    throw new ApiError('No subscription was found for this checkout session.', 400);
+  }
+
+  const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
+  await updateUserFromStripeSubscription(stripeSubscription);
+
+  let updatedUser = await User.findById(user._id);
+  if (!updatedUser) {
+    throw new ApiError('User not found after subscription confirmation.', 404);
+  }
+
+  const subscriptionStatus = String(updatedUser.subscription?.status || '').toLowerCase();
+  if (subscriptionStatus !== 'active' && paymentStatus === 'paid') {
+    const firstItem = stripeSubscription.items?.data?.[0];
+    const mappedPlan = mapStripePlanFromPriceId(firstItem?.price?.id);
+    const fallbackPlan = normalizeStripePlan(session.metadata?.plan);
+
+    updatedUser.subscription = updatedUser.subscription || {};
+    updatedUser.subscription.plan = mappedPlan !== 'free' ? mappedPlan : fallbackPlan;
+    updatedUser.subscription.status = 'active';
+    updatedUser.subscription.stripeSubscriptionId = stripeSubscription.id || updatedUser.subscription.stripeSubscriptionId;
+    updatedUser.subscription.expiresAt = stripeSubscription.current_period_end
+      ? new Date(stripeSubscription.current_period_end * 1000)
+      : updatedUser.subscription.expiresAt || null;
+
+    await updatedUser.save();
+  }
+
+  updatedUser = await User.findById(user._id);
+  if (!updatedUser) {
+    throw new ApiError('User not found after subscription activation.', 404);
+  }
+
+  return updatedUser;
 };
 
 const updateUserFromStripeSubscription = async (stripeSubscription) => {
@@ -111,6 +203,10 @@ const updateUserFromStripeSubscription = async (stripeSubscription) => {
 
   const user = await User.findOne({ stripeCustomerId: customerId });
   if (!user) {
+    return;
+  }
+
+  if (user.role !== 'patient') {
     return;
   }
 
@@ -140,7 +236,7 @@ export const handleStripeWebhookEvent = async (payload, signature) => {
     const session = event.data.object;
     const userId = session?.metadata?.userId;
     if (userId && session.customer) {
-      await User.findByIdAndUpdate(userId, {
+      await User.findOneAndUpdate({ _id: userId, role: 'patient' }, {
         stripeCustomerId: String(session.customer),
       });
     }
@@ -163,6 +259,10 @@ export const handleStripeWebhookEvent = async (payload, signature) => {
 
     const user = await User.findOne({ stripeCustomerId: customerId });
     if (!user) {
+      return event.type;
+    }
+
+    if (user.role !== 'patient') {
       return event.type;
     }
 

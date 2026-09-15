@@ -5,6 +5,7 @@ import { userValidators } from '../validators/userValidator.js';
 import { UserService } from '../services/userService.js';
 import { SystemUsageService } from '../services/systemUsageService.js';
 import { handleStripeWebhookEvent } from '../services/stripeService.js';
+import { config } from '../config/environment.js';
 
 /**
  * Validate request body against schema
@@ -88,11 +89,39 @@ export const updateSubscription = asyncHandler(async (req, res) => {
  * POST /api/v1/users/subscription/checkout
  */
 export const checkoutSubscription = asyncHandler(async (req, res) => {
-  const { plan } = req.body;
+  const { plan, returnBaseUrl } = req.body;
 
-  const checkout = await UserService.checkoutSubscription(req.user._id, { plan });
+  const requestOrigin = String(req.headers.origin || '').trim();
+  const explicitBaseUrl = String(returnBaseUrl || '').trim();
+  const appBaseUrl =
+    /^https?:\/\//i.test(explicitBaseUrl)
+      ? explicitBaseUrl
+      : /^https?:\/\//i.test(requestOrigin)
+      ? requestOrigin
+      : config.appUrl;
+  const normalizedBaseUrl = appBaseUrl.replace(/\/$/, '');
+  const successUrl = `${normalizedBaseUrl}/subscription?status=success`;
+  const cancelUrl = `${normalizedBaseUrl}/subscription?status=cancelled`;
+
+  const checkout = await UserService.checkoutSubscription(req.user._id, {
+    plan,
+    successUrl,
+    cancelUrl,
+  });
 
   res.status(200).json(new ApiResponse(200, checkout, 'Stripe checkout session created successfully'));
+});
+
+/**
+ * Confirm Stripe checkout session and activate subscription for authenticated patient
+ * POST /api/v1/users/subscription/confirm
+ */
+export const confirmSubscriptionCheckout = asyncHandler(async (req, res) => {
+  const { sessionId } = req.body;
+
+  const result = await UserService.confirmSubscriptionCheckout(req.user._id, { sessionId });
+
+  res.status(200).json(new ApiResponse(200, result, 'Subscription activated successfully'));
 });
 
 /**

@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeft, CheckCircle2, AlertCircle, CreditCard, Sparkles, ShieldCheck } from 'lucide-react';
-import { useCheckoutSubscriptionMutation } from '../services/userApi';
+import { setUser } from '../store/slices/authSlice';
+import { useCheckoutSubscriptionMutation, useConfirmSubscriptionCheckoutMutation } from '../services/userApi';
 
 const PLANS = [
   {
@@ -32,10 +33,12 @@ const formatDate = (value) => {
 
 export default function SubscriptionPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, loading: isAuthLoading } = useSelector((state) => state.auth);
   const [selectedPlan, setSelectedPlan] = useState('pro');
   const [checkoutSubscription, { isLoading }] = useCheckoutSubscriptionMutation();
+  const [confirmSubscriptionCheckout, { isLoading: isConfirming }] = useConfirmSubscriptionCheckoutMutation();
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [optimisticSubscription, setOptimisticSubscription] = useState(null);
@@ -48,23 +51,48 @@ export default function SubscriptionPage() {
 
   useEffect(() => {
     const status = searchParams.get('status');
+    const sessionId = searchParams.get('session_id') || searchParams.get('sessionId');
     if (!status) return;
 
-    if (status === 'success') {
-      setSuccessMessage('Payment completed. Your subscription will update shortly.');
-      setErrorMessage('');
-    }
+    const handleConfirmation = async () => {
+      if (status === 'success' && sessionId) {
+        try {
+          const response = await confirmSubscriptionCheckout({ sessionId }).unwrap();
+          const updatedUser = response?.data?.user;
+          const updatedSubscription = response?.data?.subscription;
 
-    if (status === 'cancelled') {
-      setErrorMessage('Checkout was cancelled. No charge was made.');
-      setSuccessMessage('');
-    }
+          if (updatedUser) {
+            dispatch(setUser(updatedUser));
+          }
 
-    const cleanedParams = new URLSearchParams(searchParams);
-    cleanedParams.delete('status');
-    cleanedParams.delete('session_id');
-    setSearchParams(cleanedParams, { replace: true });
-  }, [searchParams, setSearchParams]);
+          if (updatedSubscription) {
+            setOptimisticSubscription(updatedSubscription);
+          }
+
+          setSuccessMessage('Payment confirmed. Your subscription is now active.');
+          setErrorMessage('');
+        } catch (error) {
+          setErrorMessage(error?.data?.message || 'Payment succeeded but confirmation failed. Please refresh and try again.');
+          setSuccessMessage('');
+        }
+      } else if (status === 'success') {
+        setErrorMessage('Missing checkout session reference. Please contact support or retry checkout.');
+        setSuccessMessage('');
+      }
+
+      if (status === 'cancelled') {
+        setErrorMessage('Checkout was cancelled. No charge was made.');
+        setSuccessMessage('');
+      }
+
+      const cleanedParams = new URLSearchParams(searchParams);
+      cleanedParams.delete('status');
+      cleanedParams.delete('session_id');
+      setSearchParams(cleanedParams, { replace: true });
+    };
+
+    handleConfirmation();
+  }, [searchParams, setSearchParams, confirmSubscriptionCheckout, dispatch]);
 
   const getDashboardUrl = () => {
     switch (user?.role) {
@@ -80,7 +108,7 @@ export default function SubscriptionPage() {
   };
 
   const handleCheckout = async () => {
-    if (isCurrentSelectionActive || isLoading) {
+    if (isCurrentSelectionActive || isLoading || isConfirming) {
       return;
     }
 
@@ -89,7 +117,10 @@ export default function SubscriptionPage() {
       setSuccessMessage(`Starting secure checkout for ${selectedPlan.toUpperCase()}...`);
       setOptimisticSubscription(null);
 
-      const response = await checkoutSubscription({ plan: selectedPlan }).unwrap();
+      const response = await checkoutSubscription({
+        plan: selectedPlan,
+        returnBaseUrl: window.location.origin,
+      }).unwrap();
       const checkoutUrl = response?.data?.checkoutUrl;
 
       if (!checkoutUrl) {
@@ -240,10 +271,10 @@ export default function SubscriptionPage() {
                   <button
                     type="button"
                     onClick={handleCheckout}
-                    disabled={isLoading || isCurrentSelectionActive}
+                    disabled={isLoading || isConfirming || isCurrentSelectionActive}
                     className="mt-6 w-full py-3 px-4 bg-[#111827] text-white font-semibold rounded-xl hover:bg-[#1F2937] disabled:bg-[#D1D5DB] disabled:text-[#6B7280] disabled:cursor-not-allowed transition-all"
                   >
-                    {isLoading
+                    {isLoading || isConfirming
                       ? 'Processing...'
                       : isCurrentSelectionActive
                       ? `${selectedPlan.toUpperCase()} is your active plan`
@@ -258,7 +289,7 @@ export default function SubscriptionPage() {
                 <ShieldCheck className="w-4 h-4" /> Billing Note
               </h3>
               <p className="mt-2 text-sm text-[#065F46]">
-                Payments are processed securely by Stripe. Subscription status is synchronized via webhook events.
+                Payments are processed securely by Stripe. We confirm checkout on return and also keep webhook sync as backup.
               </p>
             </div>
           </aside>

@@ -11,6 +11,11 @@ export const requireFeature = (featureKey) => {
       throw new ApiError('User not authenticated', 401);
     }
 
+    // Subscription gating applies only to patient accounts.
+    if (req.user.role !== 'patient') {
+      return next();
+    }
+
     if (hasFeatureAccess(req.user, featureKey)) {
       return next();
     }

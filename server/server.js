@@ -5,8 +5,12 @@ import { connectDatabase } from './config/database.js';
 (async () => {
   try {
     // Connect to MongoDB
-    await connectDatabase();
-    console.log('[Server] Connected to MongoDB');
+    try {
+      await connectDatabase();
+      console.log('[Server] Connected to MongoDB');
+    } catch (error) {
+      console.warn(`[Server] Continuing without MongoDB: ${error.message}`);
+    }
 
     // Start the server
     app.listen(config.port, () => {

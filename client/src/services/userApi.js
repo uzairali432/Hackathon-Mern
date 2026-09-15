@@ -58,10 +58,17 @@ export const userApi = createApi({
       }),
     }),
     checkoutSubscription: builder.mutation({
-      query: ({ plan }) => ({
+      query: ({ plan, returnBaseUrl }) => ({
         url: '/users/subscription/checkout',
         method: 'POST',
-        body: { plan },
+        body: { plan, returnBaseUrl },
+      }),
+    }),
+    confirmSubscriptionCheckout: builder.mutation({
+      query: ({ sessionId }) => ({
+        url: '/users/subscription/confirm',
+        method: 'POST',
+        body: { sessionId },
       }),
     }),
     getAnalytics: builder.query({
@@ -107,6 +114,7 @@ export const {
   useDeleteUserMutation,
   useUpdateSubscriptionMutation,
   useCheckoutSubscriptionMutation,
+  useConfirmSubscriptionCheckoutMutation,
   useGetAnalyticsQuery,
   useGetSystemUsageQuery,
   useGetSystemHealthQuery,
